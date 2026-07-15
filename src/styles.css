@@ -1,1 +1,52 @@
-/* You can add global styles to this file, and also import other style files */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  scroll-behavior: smooth;
+}
+:root {
+  --bg-page: #f0f2f7;
+  --bg-card: #ffffff;
+  --bg-card2: #f8f9fc;
+  --border: #e4e8f0;
+  --text: #1a1d2e;
+  --text2: #5a6378;
+  --text3: #9ba3b8;
+  --radius: 14px;
+  --radius-sm: 9px;
+  --shadow: 0 2px 16px rgba(26, 29, 46, 0.07);
+  --shadow-md: 0 6px 32px rgba(26, 29, 46, 0.12);
+  --shadow-lg: 0 16px 56px rgba(26, 29, 46, 0.18);
+  --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  --sb-w: 248px;
+  --sb-w-collapsed: 68px;
+  --sb-bg: #0f1626;
+  --sb-border: rgba(255, 255, 255, 0.07);
+  --sb-text: rgba(255, 255, 255, 0.65);
+  --sb-hover: rgba(255, 255, 255, 0.06);
+  --accent: #4f8ef7;
+  --accent-light: #eef4fe;
+  --accent-dark: #2563eb;
+  --admin-accent: #4f8ef7;
+  --admin-light: #eef4fe;
+  --agent-accent: #10c27a;
+  --agent-light: #e6faf3;
+  --tech-accent: #f97316;
+  --tech-light: #fff3eb;
+  --font: sans-serif;
+}
+body {
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg-page);
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+html,
+body {
+  height: 100%;
+}

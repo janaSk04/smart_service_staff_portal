@@ -1,0 +1,321 @@
+.login-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+.login-left {
+  background: var(--sb-bg);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+.login-left-inner {
+  position: relative;
+  z-index: 2;
+}
+.login-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: #fff;
+}
+.login-form-card {
+  width: 100%;
+  max-width: 420px;
+}
+.ll-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 3rem;
+}
+.logo-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.logo-mark.sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  font-size: 0.85rem;
+}
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+}
+.logo-text strong {
+  color: var(--accent);
+}
+.logo-tag {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.ll-headline {
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+.hl-accent {
+  background: linear-gradient(135deg, var(--accent), #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.ll-sub {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  max-width: 380px;
+  margin-bottom: 2rem;
+}
+.role-previews {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+.rp-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid;
+}
+.rp-admin {
+  background: rgba(79, 142, 247, 0.15);
+  color: #82aeff;
+  border-color: rgba(79, 142, 247, 0.3);
+}
+.rp-agent {
+  background: rgba(16, 194, 122, 0.15);
+  color: #4eddaa;
+  border-color: rgba(16, 194, 122, 0.3);
+}
+.rp-tech {
+  background: rgba(249, 115, 22, 0.15);
+  color: #fdba74;
+  border-color: rgba(249, 115, 22, 0.3);
+}
+.ll-stats {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.lls-num {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  font-family: var(--mono);
+}
+.lls-label {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+}
+.lls-div {
+  width: 1px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.ll-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+.ll-orb1 {
+  width: 400px;
+  height: 400px;
+  background: rgba(79, 142, 247, 0.18);
+  top: -100px;
+  right: -100px;
+}
+.ll-orb2 {
+  width: 300px;
+  height: 300px;
+  background: rgba(167, 139, 250, 0.15);
+  bottom: -80px;
+  left: -80px;
+}
+.lf-header {
+  margin-bottom: 2rem;
+}
+.lf-header h2 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text);
+}
+.lf-header p {
+  color: var(--text2);
+  font-size: 0.9rem;
+}
+.role-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+}
+.rs-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.85rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--bg-card2);
+  font-family: var(--font);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text2);
+}
+.rs-btn.active[data-role="admin"] {
+  border-color: var(--admin-accent);
+  background: var(--admin-light);
+  color: var(--admin-accent);
+}
+.rs-btn.active[data-role="agent"] {
+  border-color: var(--agent-accent);
+  background: var(--agent-light);
+  color: var(--agent-accent);
+}
+.rs-btn.active[data-role="technician"] {
+  border-color: var(--tech-accent);
+  background: var(--tech-light);
+  color: var(--tech-accent);
+}
+.demo-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--accent-light);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.9rem;
+  font-size: 0.8rem;
+  color: var(--accent-dark);
+  margin-bottom: 1.5rem;
+}
+.demo-hint i {
+  color: var(--accent);
+}
+.lf-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+.lf-group label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.lf-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.lf-icon {
+  position: absolute;
+  left: 0.9rem;
+  color: var(--text3);
+}
+.lf-input-wrap input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  outline: none;
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition);
+}
+.lf-input-wrap input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.lf-eye {
+  position: absolute;
+  right: 0.8rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text3);
+}
+.lf-row-inline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.lf-check {
+  font-size: 0.84rem;
+  color: var(--text2);
+}
+.lf-check input {
+  accent-color: var(--accent);
+}
+.lf-forgot {
+  font-size: 0.84rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.lf-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.85rem;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: var(--font);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  transition: background var(--transition);
+}
+.lf-submit:hover {
+  background: var(--accent-dark);
+}
+.lf-submit.loading {
+  opacity: 0.8;
+  pointer-events: none;
+}
+.lf-footer-note {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text3);
+  margin-top: 1.5rem;
+  justify-content: center;
+}

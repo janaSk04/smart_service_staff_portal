@@ -1,0 +1,87 @@
+<div class="login-split">
+  <div class="login-left">
+    <div class="login-left-inner">
+      <div class="ll-logo">
+        <div class="logo-mark"><i class="fa-solid fa-bolt"></i></div>
+        <span class="logo-text">Service<strong>One</strong></span>
+        <span class="logo-tag">Staff Portal</span>
+      </div>
+      <h1 class="ll-headline">Command your<br/><span class="hl-accent">service empire.</span></h1>
+      <p class="ll-sub">Role-based dashboards for Admins, Agents, and Technicians. One login, the right view.</p>
+      <div class="role-previews">
+        <div class="rp-chip rp-admin"><i class="fa-solid fa-shield-halved"></i> Admin</div>
+        <div class="rp-chip rp-agent"><i class="fa-solid fa-headset"></i> Agent</div>
+        <div class="rp-chip rp-tech"><i class="fa-solid fa-screwdriver-wrench"></i> Technician</div>
+      </div>
+      <div class="ll-stats">
+        <div class="lls-item"><span class="lls-num">1,240</span><span class="lls-label">Open Requests</span></div>
+        <div class="lls-div"></div>
+        <div class="lls-item"><span class="lls-num">84</span><span class="lls-label">Active Techs</span></div>
+        <div class="lls-div"></div>
+        <div class="lls-item"><span class="lls-num">98.2%</span><span class="lls-label">Uptime</span></div>
+      </div>
+    </div>
+    <div class="ll-bg-grid"></div>
+    <div class="ll-orb ll-orb1"></div>
+    <div class="ll-orb ll-orb2"></div>
+  </div>
+
+  <div class="login-right" [attr.data-role]="selectedRole">
+    <div class="login-form-card">
+      <div class="lf-header">
+        <h2>Sign in</h2>
+        <p>Enter your credentials to access the portal</p>
+      </div>
+
+      <div class="role-selector">
+        <button type="button" class="rs-btn" [class.active]="selectedRole === 'admin'" data-role="admin" (click)="selectRole('admin')">
+          <i class="fa-solid fa-shield-halved"></i><span>Admin</span>
+        </button>
+        <button type="button" class="rs-btn" [class.active]="selectedRole === 'agent'" data-role="agent" (click)="selectRole('agent')">
+          <i class="fa-solid fa-headset"></i><span>Agent</span>
+        </button>
+        <button type="button" class="rs-btn" [class.active]="selectedRole === 'technician'" data-role="technician" (click)="selectRole('technician')">
+          <i class="fa-solid fa-screwdriver-wrench"></i><span>Technician</span>
+        </button>
+      </div>
+
+      <div class="demo-hint">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>{{ demoHint }}</span>
+      </div>
+
+      <form class="lf-form" (submit)="handleLogin($event)">
+        <div class="lf-group">
+          <label>Email Address</label>
+          <div class="lf-input-wrap">
+            <i class="fa-solid fa-envelope lf-icon"></i>
+            <input type="email" [(ngModel)]="email" name="email" placeholder="you@servex.lk" required />
+          </div>
+        </div>
+        <div class="lf-group">
+          <label>Password</label>
+          <div class="lf-input-wrap">
+            <i class="fa-solid fa-lock lf-icon"></i>
+            <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" placeholder="••••••••" required />
+            <button type="button" class="lf-eye" (click)="togglePassword()">
+              <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+            </button>
+          </div>
+        </div>
+        <div class="lf-row-inline">
+          <label class="lf-check"><input type="checkbox" checked /> Remember me</label>
+          <a href="#" class="lf-forgot">Forgot password?</a>
+        </div>
+        <button type="submit" class="lf-submit" [class.loading]="loading">
+          <span>{{ loading ? 'Signing in...' : 'Sign In' }}</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <div class="lf-footer-note">
+        <i class="fa-solid fa-shield"></i> Secure, role-based access. All activity is logged.
+      </div>
+    </div>
+  </div>
+</div>
+
