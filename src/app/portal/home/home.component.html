@@ -1,0 +1,7 @@
+<div class="dash-view active">
+  <ng-container [ngSwitch]="role">
+    <app-admin-dashboard *ngSwitchCase="'admin'"></app-admin-dashboard>
+    <app-agent-dashboard *ngSwitchCase="'agent'"></app-agent-dashboard>
+    <app-technician-dashboard *ngSwitchCase="'technician'"></app-technician-dashboard>
+  </ng-container>
+</div>
