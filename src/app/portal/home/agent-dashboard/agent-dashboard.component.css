@@ -1,0 +1,41 @@
+.stack-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.assign-to {
+  font-size: 0.82rem;
+  color: var(--text2);
+}
+
+.sla-row {
+  margin-bottom: 0.85rem;
+}
+
+.sla-row:last-child {
+  margin-bottom: 0;
+}
+
+.sla-row-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+.sla-pct {
+  font-size: 0.78rem;
+  font-family: var(--mono);
+  font-weight: 700;
+}
+
+.tech-status-label {
+  font-size: 0.72rem;
+  color: var(--text3);
+}
+
+.tl-dot i {
+  font-size: 0.6rem;
+}

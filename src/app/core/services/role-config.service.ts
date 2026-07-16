@@ -104,9 +104,10 @@ const ROLE_CONFIG: Record<StaffRole, RoleConfig> = {
       {
         section: 'Management',
         items: [
-          { id: 'users', icon: 'fa-users', label: 'User Management', badge: '124', route: '/portal/users' },
           { id: 'services', icon: 'fa-list-check', label: 'Service Catalog', badge: null, route: '/portal/services' },
           { id: 'requests', icon: 'fa-ticket', label: 'All Requests', badge: '42', route: '/portal/requests' },
+          { id: 'complaints', icon: 'fa-face-frown', label: 'Complaints', badge: '7', route: '/portal/complaints' },
+          { id: 'users', icon: 'fa-users', label: 'User Management', badge: '124', route: '/portal/users' },
           { id: 'agents', icon: 'fa-headset', label: 'Agents', badge: null, route: '/portal/agents' },
           { id: 'technicians', icon: 'fa-screwdriver-wrench', label: 'Technicians', badge: null, route: '/portal/technicians' },
         ],
@@ -139,6 +140,7 @@ const ROLE_CONFIG: Record<StaffRole, RoleConfig> = {
         section: 'Operations',
         items: [
           { id: 'requests', icon: 'fa-ticket', label: 'Service Requests', badge: '18', route: '/portal/requests' },
+          { id: 'complaints', icon: 'fa-face-frown', label: 'Complaints', badge: '5', route: '/portal/complaints' },
           { id: 'assign', icon: 'fa-arrows-spin', label: 'Assignments', badge: '7', route: '/portal/assign' },
           { id: 'technicians', icon: 'fa-screwdriver-wrench', label: 'My Technicians', badge: null, route: '/portal/technicians' },
           { id: 'schedule', icon: 'fa-calendar-days', label: 'Schedule', badge: null, route: '/portal/schedule' },
@@ -185,4 +187,4 @@ const ROLE_CONFIG: Record<StaffRole, RoleConfig> = {
       },
     ],
   },
-}
+};

@@ -120,6 +120,30 @@ export function getPriorityRawBadge(priority: string): string {
   return map[priority] ?? 'badge-gray';
 }
 
+const COMPLAINT_STATUS_LABELS: Record<string, [string, string]> = {
+  open: ['badge-red', 'Open'],
+  investigating: ['badge-orange', 'Investigating'],
+  escalated: ['badge-purple', 'Escalated'],
+  resolved: ['badge-green', 'Resolved'],
+};
+
+const COMPLAINT_SEVERITY_LABELS: Record<string, [string, string]> = {
+  critical: ['badge-red', 'Critical'],
+  high: ['badge-orange', 'High'],
+  medium: ['badge-yellow', 'Medium'],
+  low: ['badge-gray', 'Low'],
+};
+
+export function getComplaintStatusBadge(status: string): { cls: string; label: string } {
+  const [cls, label] = COMPLAINT_STATUS_LABELS[status] ?? ['badge-gray', status];
+  return { cls, label };
+}
+
+export function getComplaintSeverityBadge(severity: string): { cls: string; label: string } {
+  const [cls, label] = COMPLAINT_SEVERITY_LABELS[severity] ?? ['badge-gray', severity];
+  return { cls, label };
+}
+
 export function getUserRoleBadge(role: string): string {
   const map: Record<string, string> = {
     Admin: 'badge-blue',

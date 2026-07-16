@@ -52,8 +52,36 @@ export interface DonutSegment {
   count: string;
 }
 
+export type ComplaintStatus = 'open' | 'investigating' | 'escalated' | 'resolved';
+export type ComplaintSeverity = 'low' | 'medium' | 'high' | 'critical';
+
+export interface CustomerComplaint {
+  id: string;
+  customer: string;
+  phone: string;
+  requestId: string;
+  service: string;
+  subject: string;
+  detail: string;
+  severity: ComplaintSeverity;
+  status: ComplaintStatus;
+  zone: string;
+  agent: string;
+  createdAt: string;
+}
+
 export type TechStatus = 'available' | 'busy' | 'offline';
-export type JobPriority = 'critical' | 'high' | 'normal' | 'low';
+export type JobPriority = 'critical' | 'high' | 'normal' | 'medium' | 'low';
+export type TechJobPriority = 'critical' | 'high' | 'medium' | 'low';
+
+export type TechJobWorkStatus =
+  | 'available'
+  | 'enroute'
+  | 'inprogress'
+  | 'onhold'
+  | 'partially_done'
+  | 'done'
+  | 'rejected';
 
 export interface AgentQueueItem {
   id: string;
@@ -62,6 +90,53 @@ export interface AgentQueueItem {
   priority: JobPriority;
   assignedTo: string;
 }
+
+export interface TechJob {
+  id: string;
+  service: string;
+  category: string;
+  priority: TechJobPriority;
+  customer: string;
+  phone: string;
+  address: string;
+  due: string;
+  amount?: string;
+  status: TechJobWorkStatus;
+  statusLabel: string;
+  statusBadge: string;
+  borderColor: string;
+  variant: 'enroute' | 'progress' | 'scheduled';
+  filterStatus?: JobFilterStatus;
+  statusReason?: string;
+  accepted?: boolean;
+  reassignRequested?: boolean;
+}
+
+export type JobFilterStatus = TechJobWorkStatus;
+export type JobFilterOption = 'all' | JobFilterStatus;
+
+export const TECH_JOB_PRIORITY_META: Record<
+  TechJobPriority,
+  { label: string; badge: string }
+> = {
+  critical: { label: 'Critical', badge: 'badge-red' },
+  high: { label: 'High', badge: 'badge-orange' },
+  medium: { label: 'Medium', badge: 'badge-yellow' },
+  low: { label: 'Low', badge: 'badge-gray' },
+};
+
+export const TECH_JOB_STATUS_META: Record<
+  TechJobWorkStatus,
+  { label: string; badge: string; border: string; variant: TechJob['variant']; filter: JobFilterStatus }
+> = {
+  available: { label: 'Available', badge: 'badge-blue', border: '#4f8ef7', variant: 'scheduled', filter: 'available' },
+  enroute: { label: 'En Route', badge: 'badge-blue', border: '#4f8ef7', variant: 'enroute', filter: 'enroute' },
+  inprogress: { label: 'In Progress', badge: 'badge-green', border: '#10b981', variant: 'progress', filter: 'inprogress' },
+  onhold: { label: 'On Hold', badge: 'badge-orange', border: '#f97316', variant: 'scheduled', filter: 'onhold' },
+  partially_done: { label: 'Partially Done', badge: 'badge-purple', border: '#8b5cf6', variant: 'progress', filter: 'partially_done' },
+  done: { label: 'Done', badge: 'badge-green', border: '#10b981', variant: 'progress', filter: 'done' },
+  rejected: { label: 'Rejected', badge: 'badge-red', border: '#ef4444', variant: 'scheduled', filter: 'rejected' },
+};
 
 export interface SlaItem {
   label: string;
@@ -93,27 +168,10 @@ export interface TechKpi {
   color: string;
 }
 
-export interface TechJob {
-  id: string;
-  service: string;
-  customer: string;
-  phone: string;
-  address: string;
-  due: string;
-  amount?: string;
-  statusLabel: string;
-  statusBadge: string;
-  borderColor: string;
-  variant: 'enroute' | 'progress' | 'scheduled';
-  filterStatus?: JobFilterStatus;
-}
-
-export type JobFilterStatus = 'enroute' | 'progress' | 'scheduled' | 'completed';
-export type JobFilterOption = 'all' | JobFilterStatus;
-
 export interface ScheduleDayChip {
   label: string;
   bg: string;
+  job?: TechJob;
 }
 
 export interface ScheduleCalendarDay {
@@ -209,7 +267,7 @@ export class PortalDataService {
     { icon: 'fa-hourglass-half', label: 'In Progress', value: '67', scColor: '#f59e0b', iconBg: '#fef3c7', iconColor: '#92400e', delta: '3 near SLA breach', deltaDir: 'down' },
     { icon: 'fa-users', label: 'Active Users', value: '312', scColor: '#8b5cf6', iconBg: '#f3e8ff', iconColor: '#6b21a8', delta: '+5 this month', deltaDir: 'up' },
     { icon: 'fa-screwdriver-wrench', label: 'Technicians', value: '84', scColor: '#f97316', iconBg: '#ffedd5', iconColor: '#9a3412', delta: '72 on shift', deltaDir: 'up' },
-    { icon: 'fa-star', label: 'Avg CSAT', value: '4.87', scColor: '#ec4899', iconBg: '#fce7f3', iconColor: '#9d174d', delta: '↑ 0.12 pts', deltaDir: 'up' },
+    { icon: 'fa-face-frown', label: 'Open Complaints', value: '7', scColor: '#ef4444', iconBg: '#fee2e2', iconColor: '#991b1b', delta: '2 critical', deltaDir: 'down' },
   ];
 
   readonly weekChartData = [62, 78, 55, 89, 94, 71, 85];
@@ -225,9 +283,111 @@ export class PortalDataService {
   readonly activities: ActivityItem[] = [
     { icon: 'fa-user-plus', color: '#4f8ef7', bg: '#eef4fe', title: 'New technician onboarded', desc: 'Chamara Tissa added to Colombo zone', time: '2m ago' },
     { icon: 'fa-exclamation-triangle', color: '#ef4444', bg: '#fee2e2', title: 'SLA breach detected', desc: 'REQ-0320 overdue by 45 minutes', time: '8m ago' },
+    { icon: 'fa-face-frown', color: '#ef4444', bg: '#fee2e2', title: 'New customer complaint', desc: 'CMP-104 — Late arrival · Priya Mendis', time: '12m ago' },
     { icon: 'fa-circle-check', color: '#10b981', bg: '#d1fae5', title: 'Bulk requests completed', desc: 'Zone 4 — 12 garbage pickups done', time: '15m ago' },
     { icon: 'fa-user-slash', color: '#f59e0b', bg: '#fef3c7', title: 'Agent reassigned', desc: 'Nadeesha moved to Zone 2', time: '1h ago' },
     { icon: 'fa-chart-line', color: '#8b5cf6', bg: '#f3e8ff', title: 'Weekly report ready', desc: 'Download Q1 2026 summary', time: '2h ago' },
+  ];
+
+  customerComplaints: CustomerComplaint[] = [
+    {
+      id: 'CMP-104',
+      customer: 'Priya Mendis',
+      phone: '+94 77 234 5678',
+      requestId: 'REQ-0341',
+      service: 'Garbage Collection',
+      subject: 'Late arrival',
+      detail: 'Technician arrived 40 minutes after promised ETA.',
+      severity: 'high',
+      status: 'open',
+      zone: 'Zone 1',
+      agent: 'Nadeesha Silva',
+      createdAt: '12m ago',
+    },
+    {
+      id: 'CMP-103',
+      customer: 'Kamal Silva',
+      phone: '+94 71 456 7890',
+      requestId: 'REQ-0338',
+      service: 'Plumbing Repair',
+      subject: 'Incomplete work',
+      detail: 'Leak returned within 2 hours of visit.',
+      severity: 'critical',
+      status: 'escalated',
+      zone: 'Zone 1',
+      agent: 'Nadeesha Silva',
+      createdAt: '45m ago',
+    },
+    {
+      id: 'CMP-102',
+      customer: 'Amara Perera',
+      phone: '+94 72 345 6789',
+      requestId: 'REQ-0350',
+      service: 'Pest Control',
+      subject: 'Rude behavior',
+      detail: 'Customer reported unprofessional communication on site.',
+      severity: 'medium',
+      status: 'investigating',
+      zone: 'Zone 1',
+      agent: 'Kasun Perera',
+      createdAt: '2h ago',
+    },
+    {
+      id: 'CMP-101',
+      customer: 'Nimali Kumari',
+      phone: '+94 76 789 0123',
+      requestId: 'REQ-0345',
+      service: 'Recycling Pickup',
+      subject: 'Missed pickup',
+      detail: 'Bins were left full; no visit recorded.',
+      severity: 'high',
+      status: 'open',
+      zone: 'Zone 2',
+      agent: 'Kasun Perera',
+      createdAt: '3h ago',
+    },
+    {
+      id: 'CMP-100',
+      customer: 'Dilshan Rajapaksa',
+      phone: '+94 77 888 9900',
+      requestId: 'REQ-0342',
+      service: 'AC Service',
+      subject: 'Overcharged',
+      detail: 'Invoice higher than quote without approval.',
+      severity: 'medium',
+      status: 'open',
+      zone: 'Zone 1',
+      agent: 'Nadeesha Silva',
+      createdAt: '5h ago',
+    },
+    {
+      id: 'CMP-099',
+      customer: 'Ramya Dias',
+      phone: '+94 75 444 1122',
+      requestId: 'REQ-0374',
+      service: 'Deep Cleaning',
+      subject: 'Property damage',
+      detail: 'Scratched flooring reported after cleaning.',
+      severity: 'critical',
+      status: 'investigating',
+      zone: 'Zone 3',
+      agent: 'Dimali W.',
+      createdAt: 'Yesterday',
+    },
+    {
+      id: 'CMP-098',
+      customer: 'Sunil Jayawardena',
+      phone: '+94 76 555 6677',
+      requestId: 'REQ-0371',
+      service: 'Garbage Collection',
+      subject: 'No-show',
+      detail: 'Scheduled slot missed with no call.',
+      severity: 'low',
+      status: 'resolved',
+      zone: 'Zone 2',
+      agent: 'Kasun Perera',
+      createdAt: 'Yesterday',
+    },
   ];
 
   readonly mapPins = [
@@ -247,12 +407,32 @@ export class PortalDataService {
     { id: 'REQ-0320', service: 'Electrical', customer: 'Nimali K.', agent: 'Nadeesha S.', tech: 'Kasun P.', priority: 'high', status: 'overdue' },
   ];
 
-  readonly adminAgents: AdminAgent[] = [
+  adminAgents: AdminAgent[] = [
     { id: 'AG-001', av: 'NS', avColor: '#10c27a', name: 'Nadeesha S.', zone: 'Zone 1', open: 18, pct: '94%', health: 'green' },
     { id: 'AG-002', av: 'KP', avColor: '#4f8ef7', name: 'Kasun P.', zone: 'Zone 2', open: 23, pct: '88%', health: 'yellow' },
     { id: 'AG-003', av: 'DW', avColor: '#8b5cf6', name: 'Dimali W.', zone: 'Zone 3', open: 11, pct: '97%', health: 'green' },
     { id: 'AG-004', av: 'RL', avColor: '#f97316', name: 'Rohan L.', zone: 'Zone 4', open: 29, pct: '79%', health: 'orange' },
   ];
+
+  addAdminAgent(input: { name: string; zone: string; email?: string }): AdminAgent {
+    const parts = input.name.trim().split(/\s+/).filter(Boolean);
+    const av = parts.length >= 2
+      ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+      : input.name.slice(0, 2).toUpperCase();
+    const colors = ['#10c27a', '#4f8ef7', '#8b5cf6', '#f97316', '#ec4899', '#14b8a6'];
+    const agent: AdminAgent = {
+      id: `AG-${String(this.adminAgents.length + 1).padStart(3, '0')}`,
+      av,
+      avColor: colors[this.adminAgents.length % colors.length],
+      name: input.name.trim(),
+      zone: input.zone.trim(),
+      open: 0,
+      pct: '—',
+      health: 'green',
+    };
+    this.adminAgents.unshift(agent);
+    return agent;
+  }
 
   getRecentRequests(limit = 5): AdminRequest[] {
     return this.adminRequests.slice(0, limit);
@@ -262,11 +442,43 @@ export class PortalDataService {
     return this.adminAgents.slice(0, limit);
   }
 
+  getCustomerComplaints(options?: {
+    zone?: string;
+    openOnly?: boolean;
+    limit?: number;
+  }): CustomerComplaint[] {
+    let list = [...this.customerComplaints];
+    if (options?.zone) {
+      list = list.filter((c) => c.zone === options.zone);
+    }
+    if (options?.openOnly) {
+      list = list.filter((c) => c.status !== 'resolved');
+    }
+    if (options?.limit != null) {
+      list = list.slice(0, options.limit);
+    }
+    return list;
+  }
+
+  getOpenComplaintCount(zone?: string): number {
+    return this.getCustomerComplaints({ zone, openOnly: true }).length;
+  }
+
+  updateComplaintStatus(
+    complaintId: string,
+    status: ComplaintStatus
+  ): CustomerComplaint | null {
+    const row = this.customerComplaints.find((c) => c.id === complaintId);
+    if (!row) return null;
+    row.status = status;
+    return { ...row };
+  }
+
   readonly agentStats: DashboardStat[] = [
     { icon: 'fa-inbox', label: 'Queue', value: '18', scColor: '#10c27a', iconBg: '#e6faf3', iconColor: '#065f46', delta: '5 high priority', deltaDir: 'down' },
     { icon: 'fa-arrows-spin', label: 'Assigned Today', value: '34', scColor: '#10c27a', iconBg: '#e6faf3', iconColor: '#065f46', delta: '+8 since morning', deltaDir: 'up' },
     { icon: 'fa-hourglass', label: 'Near SLA Breach', value: '4', scColor: '#ef4444', iconBg: '#fee2e2', iconColor: '#991b1b', delta: 'Needs attention', deltaDir: 'down' },
-    { icon: 'fa-star', label: 'Avg Team Rating', value: '4.7', scColor: '#f59e0b', iconBg: '#fef3c7', iconColor: '#92400e', delta: '↑ 0.2 this week', deltaDir: 'up' },
+    { icon: 'fa-face-frown', label: 'Open Complaints', value: '5', scColor: '#ef4444', iconBg: '#fee2e2', iconColor: '#991b1b', delta: 'Zone 1 open', deltaDir: 'down' },
   ];
 
   readonly agentQueue: AgentQueueItem[] = [
@@ -315,10 +527,13 @@ export class PortalDataService {
     {
       id: 'REQ-2026-0341',
       service: 'Garbage Collection',
+      category: 'Waste',
+      priority: 'high',
       customer: 'Priya Mendis',
       phone: '+94 77 234 5678',
       address: '123 Galle Rd, Col 03',
       due: '11:00 AM',
+      status: 'enroute',
       statusLabel: 'En Route',
       statusBadge: 'badge-blue',
       borderColor: '#4f8ef7',
@@ -327,10 +542,13 @@ export class PortalDataService {
     {
       id: 'REQ-2026-0338',
       service: 'Plumbing Repair',
+      category: 'Home',
+      priority: 'critical',
       customer: 'Kamal Silva',
       phone: '+94 71 456 7890',
       address: '45 Ward Pl, Col 07',
       due: '1:00 PM',
+      status: 'inprogress',
       statusLabel: 'In Progress',
       statusBadge: 'badge-green',
       borderColor: '#10b981',
@@ -339,11 +557,14 @@ export class PortalDataService {
     {
       id: 'REQ-2026-0345',
       service: 'Recycling Pickup',
+      category: 'Waste',
+      priority: 'medium',
       customer: 'Nimali Kumari',
       phone: '+94 76 789 0123',
       address: '87 Rajagiriya Rd',
       due: '3:00 PM',
-      statusLabel: 'Scheduled',
+      status: 'available',
+      statusLabel: 'Available',
       statusBadge: 'badge-yellow',
       borderColor: '#f59e0b',
       variant: 'scheduled',
@@ -362,62 +583,97 @@ export class PortalDataService {
     { icon: 'fa-check', color: '#10b981', bg: '#d1fae5', title: 'Electrical Repair', desc: 'REQ-0315 — Completed 10:15 AM', time: '5.0 ★' },
   ];
 
-  readonly techAllJobs: TechJob[] = [
+  techAllJobs: TechJob[] = [
     {
       id: 'REQ-0341',
       service: 'Garbage Collection',
+      category: 'Waste',
+      priority: 'high',
       customer: 'Priya Mendis',
       phone: '+94 77 234 5678',
       address: '123 Galle Rd, Col 03',
       due: '11:00 AM',
       amount: 'LKR 800',
-      statusLabel: 'En Route',
-      statusBadge: 'badge-blue',
-      borderColor: '#4f8ef7',
-      variant: 'enroute',
-      filterStatus: 'enroute',
+      status: 'available',
+      statusLabel: 'Available',
+      statusBadge: 'badge-yellow',
+      borderColor: '#f59e0b',
+      variant: 'scheduled',
+      filterStatus: 'available',
+      accepted: false,
     },
     {
       id: 'REQ-0338',
       service: 'Plumbing Repair',
+      category: 'Home',
+      priority: 'critical',
       customer: 'Kamal Silva',
       phone: '+94 71 456 7890',
       address: '45 Ward Pl, Col 07',
       due: '1:00 PM',
       amount: 'LKR 1,500',
-      statusLabel: 'In Progress',
-      statusBadge: 'badge-green',
-      borderColor: '#10b981',
-      variant: 'progress',
-      filterStatus: 'progress',
+      status: 'available',
+      statusLabel: 'Available',
+      statusBadge: 'badge-yellow',
+      borderColor: '#f59e0b',
+      variant: 'scheduled',
+      filterStatus: 'available',
+      accepted: false,
     },
     {
       id: 'REQ-0345',
       service: 'Recycling Pickup',
+      category: 'Waste',
+      priority: 'medium',
       customer: 'Nimali Kumari',
       phone: '+94 76 789 0123',
       address: '87 Rajagiriya Rd',
       due: '3:00 PM',
       amount: 'LKR 600',
-      statusLabel: 'Scheduled',
+      status: 'available',
+      statusLabel: 'Available',
       statusBadge: 'badge-yellow',
       borderColor: '#f59e0b',
       variant: 'scheduled',
-      filterStatus: 'scheduled',
+      filterStatus: 'available',
+      accepted: false,
     },
     {
       id: 'REQ-0350',
       service: 'Pest Control',
+      category: 'Home',
+      priority: 'low',
       customer: 'Amara Perera',
       phone: '+94 72 345 6789',
       address: '12 Cinnamon Gdns',
       due: '5:00 PM',
       amount: 'LKR 3,000',
-      statusLabel: 'Scheduled',
+      status: 'available',
+      statusLabel: 'Available',
       statusBadge: 'badge-yellow',
       borderColor: '#f59e0b',
       variant: 'scheduled',
-      filterStatus: 'scheduled',
+      filterStatus: 'available',
+      accepted: false,
+    },
+    {
+      id: 'REQ-0342',
+      service: 'AC Service',
+      category: 'Home',
+      priority: 'high',
+      customer: 'Dilshan Rajapaksa',
+      phone: '+94 77 888 9900',
+      address: '56 Baseline Rd',
+      due: '4:00 PM',
+      amount: 'LKR 2,500',
+      status: 'rejected',
+      statusLabel: 'Rejected',
+      statusBadge: 'badge-red',
+      borderColor: '#ef4444',
+      variant: 'scheduled',
+      filterStatus: 'rejected',
+      statusReason: 'Customer not home / unsafe access',
+      accepted: false,
     },
   ];
 
@@ -436,20 +692,210 @@ export class PortalDataService {
 
   readonly scheduleDayEvents: Record<number, ScheduleDayChip[]> = {
     8: [
-      { label: '11:00 AM — Garbage Collection', bg: 'var(--accent)' },
-      { label: '1:00 PM — Plumbing Repair', bg: '#10b981' },
-      { label: '3:00 PM — Recycling Pickup', bg: '#f59e0b' },
+      {
+        label: '11:00 AM — Garbage Collection',
+        bg: 'var(--accent)',
+        job: {
+          id: 'REQ-0341',
+          service: 'Garbage Collection',
+          category: 'Waste',
+          priority: 'high',
+          customer: 'Priya Mendis',
+          phone: '+94 77 234 5678',
+          address: '123 Galle Rd, Col 03',
+          due: '11:00 AM',
+          amount: 'LKR 800',
+          status: 'enroute',
+          statusLabel: 'En Route',
+          statusBadge: 'badge-blue',
+          borderColor: '#4f8ef7',
+          variant: 'enroute',
+        },
+      },
+      {
+        label: '1:00 PM — Plumbing Repair',
+        bg: '#10b981',
+        job: {
+          id: 'REQ-0338',
+          service: 'Plumbing Repair',
+          category: 'Home',
+          priority: 'critical',
+          customer: 'Kamal Silva',
+          phone: '+94 71 456 7890',
+          address: '45 Ward Pl, Col 07',
+          due: '1:00 PM',
+          amount: 'LKR 1,500',
+          status: 'inprogress',
+          statusLabel: 'In Progress',
+          statusBadge: 'badge-green',
+          borderColor: '#10b981',
+          variant: 'progress',
+        },
+      },
+      {
+        label: '3:00 PM — Recycling Pickup',
+        bg: '#f59e0b',
+        job: {
+          id: 'REQ-0345',
+          service: 'Recycling Pickup',
+          category: 'Waste',
+          priority: 'medium',
+          customer: 'Nimali Kumari',
+          phone: '+94 76 789 0123',
+          address: '87 Rajagiriya Rd',
+          due: '3:00 PM',
+          amount: 'LKR 600',
+          status: 'available',
+          statusLabel: 'Available',
+          statusBadge: 'badge-yellow',
+          borderColor: '#f59e0b',
+          variant: 'scheduled',
+        },
+      },
     ],
     10: [
-      { label: '9:00 AM — Deep Cleaning', bg: '#10b981' },
-      { label: '2:00 PM — Pest Control', bg: '#8b5cf6' },
+      {
+        label: '9:00 AM — Deep Cleaning',
+        bg: '#10b981',
+        job: {
+          id: 'REQ-0360',
+          service: 'Deep Cleaning',
+          category: 'Home',
+          priority: 'medium',
+          customer: 'Amara Perera',
+          phone: '+94 77 111 2233',
+          address: '5 Cinnamon Gdns',
+          due: '9:00 AM',
+          amount: 'LKR 3,200',
+          status: 'available',
+          statusLabel: 'Available',
+          statusBadge: 'badge-yellow',
+          borderColor: '#10b981',
+          variant: 'scheduled',
+        },
+      },
+      {
+        label: '2:00 PM — Pest Control',
+        bg: '#8b5cf6',
+        job: {
+          id: 'REQ-0350',
+          service: 'Pest Control',
+          category: 'Home',
+          priority: 'low',
+          customer: 'Amara Perera',
+          phone: '+94 72 345 6789',
+          address: '12 Cinnamon Gdns',
+          due: '2:00 PM',
+          amount: 'LKR 3,000',
+          status: 'partially_done',
+          statusLabel: 'Partially Done',
+          statusBadge: 'badge-purple',
+          borderColor: '#8b5cf6',
+          variant: 'progress',
+        },
+      },
     ],
     14: [
-      { label: '8:00 AM — Electrical Repair', bg: '#f59e0b' },
-      { label: '10:30 AM — Garbage Collection', bg: 'var(--accent)' },
-      { label: '1:00 PM — Plumbing', bg: '#10b981' },
-      { label: '3:30 PM — Recycling', bg: '#8b5cf6' },
-      { label: '5:00 PM — Deep Cleaning', bg: '#ef4444' },
+      {
+        label: '8:00 AM — Electrical Repair',
+        bg: '#f59e0b',
+        job: {
+          id: 'REQ-0370',
+          service: 'Electrical Repair',
+          category: 'Electrical',
+          priority: 'high',
+          customer: 'Nimali Kumari',
+          phone: '+94 71 222 3344',
+          address: '12 Ward Pl, Col 07',
+          due: '8:00 AM',
+          amount: 'LKR 2,200',
+          status: 'available',
+          statusLabel: 'Available',
+          statusBadge: 'badge-yellow',
+          borderColor: '#f59e0b',
+          variant: 'scheduled',
+        },
+      },
+      {
+        label: '10:30 AM — Garbage Collection',
+        bg: 'var(--accent)',
+        job: {
+          id: 'REQ-0371',
+          service: 'Garbage Collection',
+          category: 'Waste',
+          priority: 'medium',
+          customer: 'Sunil Jayawardena',
+          phone: '+94 76 555 6677',
+          address: '33 Duplication Rd',
+          due: '10:30 AM',
+          amount: 'LKR 800',
+          status: 'enroute',
+          statusLabel: 'En Route',
+          statusBadge: 'badge-blue',
+          borderColor: '#4f8ef7',
+          variant: 'enroute',
+        },
+      },
+      {
+        label: '1:00 PM — Plumbing',
+        bg: '#10b981',
+        job: {
+          id: 'REQ-0372',
+          service: 'Plumbing Repair',
+          category: 'Home',
+          priority: 'critical',
+          customer: 'Kamal Silva',
+          phone: '+94 71 456 7890',
+          address: '22 Galle Rd, Col 03',
+          due: '1:00 PM',
+          amount: 'LKR 1,500',
+          status: 'inprogress',
+          statusLabel: 'In Progress',
+          statusBadge: 'badge-green',
+          borderColor: '#10b981',
+          variant: 'progress',
+        },
+      },
+      {
+        label: '3:30 PM — Recycling',
+        bg: '#8b5cf6',
+        job: {
+          id: 'REQ-0373',
+          service: 'Recycling Pickup',
+          category: 'Waste',
+          priority: 'low',
+          customer: 'Dilshan Rajapaksa',
+          phone: '+94 77 888 9900',
+          address: '78 Baseline Rd',
+          due: '3:30 PM',
+          amount: 'LKR 600',
+          status: 'available',
+          statusLabel: 'Available',
+          statusBadge: 'badge-yellow',
+          borderColor: '#8b5cf6',
+          variant: 'scheduled',
+        },
+      },
+      {
+        label: '5:00 PM — Deep Cleaning',
+        bg: '#ef4444',
+        job: {
+          id: 'REQ-0374',
+          service: 'Deep Cleaning',
+          category: 'Home',
+          priority: 'high',
+          customer: 'Ramya Dias',
+          phone: '+94 75 444 1122',
+          address: '90 Rajagiriya Rd',
+          due: '5:00 PM',
+          amount: 'LKR 3,200',
+          status: 'available',
+          statusLabel: 'Available',
+          statusBadge: 'badge-yellow',
+          borderColor: '#ef4444',
+          variant: 'scheduled',
+        },
+      },
     ],
   };
 
@@ -458,8 +904,92 @@ export class PortalDataService {
   }
 
   getTechJobs(filter: JobFilterOption = 'all'): TechJob[] {
-    if (filter === 'all') return this.techAllJobs;
-    return this.techAllJobs.filter((j) => j.filterStatus === filter);
+    if (filter === 'all') return [...this.techAllJobs];
+    return this.techAllJobs.filter((j) => j.status === filter || j.filterStatus === filter);
+  }
+
+  /** Pending Accept/Reject — Update Status is hidden until Accept. */
+  isPendingDecision(job: TechJob): boolean {
+    if (job.status === 'rejected' || job.status === 'done') return false;
+    return job.accepted !== true;
+  }
+
+  isJobAccepted(job: TechJob): boolean {
+    return job.accepted === true && job.status !== 'rejected';
+  }
+
+  acceptTechJob(jobId: string): TechJob | null {
+    const job = this.techAllJobs.find((j) => j.id === jobId);
+    if (!job || job.status === 'rejected' || job.status === 'done') return null;
+    job.accepted = true;
+    job.reassignRequested = false;
+    this.syncDashJob(job);
+    return { ...job };
+  }
+
+  redoTechJob(jobId: string): TechJob | null {
+    const job = this.techAllJobs.find((j) => j.id === jobId);
+    if (!job || job.status !== 'rejected') return null;
+
+    const meta = TECH_JOB_STATUS_META.available;
+    job.status = 'available';
+    job.statusLabel = meta.label;
+    job.statusBadge = meta.badge;
+    job.borderColor = meta.border;
+    job.variant = meta.variant;
+    job.filterStatus = meta.filter;
+    job.statusReason = undefined;
+    job.accepted = false;
+    job.reassignRequested = false;
+    this.syncDashJob(job);
+    return { ...job };
+  }
+
+  requestJobReassign(jobId: string): TechJob | null {
+    const job = this.techAllJobs.find((j) => j.id === jobId);
+    if (!job || job.status !== 'rejected') return null;
+    job.reassignRequested = true;
+    this.syncDashJob(job);
+    return { ...job };
+  }
+
+  updateTechJobStatus(
+    jobId: string,
+    status: TechJobWorkStatus,
+    reason?: string
+  ): TechJob | null {
+    const job = this.techAllJobs.find((j) => j.id === jobId);
+    if (!job) return null;
+
+    const needsReason = status === 'onhold' || status === 'rejected';
+    if (needsReason && !reason?.trim()) return null;
+
+    const meta = TECH_JOB_STATUS_META[status];
+    job.status = status;
+    job.statusLabel = meta.label;
+    job.statusBadge = meta.badge;
+    job.borderColor = meta.border;
+    job.variant = meta.variant;
+    job.filterStatus = meta.filter;
+    job.statusReason = needsReason ? reason!.trim() : undefined;
+    job.accepted = status !== 'rejected';
+    if (status === 'rejected') job.reassignRequested = false;
+
+    this.syncDashJob(job);
+    return { ...job };
+  }
+
+  private syncDashJob(job: TechJob): void {
+    const dash = this.techJobs.find((j) => j.id === job.id || j.id.endsWith(job.id.replace('REQ-', '')));
+    if (!dash) return;
+    dash.status = job.status;
+    dash.statusLabel = job.statusLabel;
+    dash.statusBadge = job.statusBadge;
+    dash.borderColor = job.borderColor;
+    dash.variant = job.variant;
+    dash.statusReason = job.statusReason;
+    dash.accepted = job.accepted;
+    dash.reassignRequested = job.reassignRequested;
   }
 
   readonly historyStats = [
@@ -569,7 +1099,7 @@ export class PortalDataService {
     return Math.min(100, jobs * 20);
   }
 
-  readonly adminUsers: AdminUser[] = [
+  adminUsers: AdminUser[] = [
     { id: 'USR-001', av: 'AP', color: '#4f8ef7', name: 'Arjun Perera', email: 'admin@servex.lk', role: 'Admin', dept: 'System', status: 'active', lastActive: 'Just now' },
     { id: 'USR-002', av: 'NS', color: '#10c27a', name: 'Nadeesha Silva', email: 'agent@servex.lk', role: 'Agent', dept: 'Zone 1', status: 'active', lastActive: '5m ago' },
     { id: 'USR-003', av: 'RF', color: '#f97316', name: 'Roshan Fernando', email: 'tech@servex.lk', role: 'Technician', dept: 'Zone 1', status: 'active', lastActive: '12m ago' },
@@ -577,6 +1107,33 @@ export class PortalDataService {
     { id: 'USR-005', av: 'DT', color: '#ec4899', name: 'Dimali Tissera', email: 'd.tissera@servex.lk', role: 'Technician', dept: 'Zone 3', status: 'active', lastActive: '1h ago' },
     { id: 'USR-006', av: 'PM', color: '#14b8a6', name: 'Pradeep Madushan', email: 'p.madushan@servex.lk', role: 'Technician', dept: 'Zone 2', status: 'active', lastActive: '30m ago' },
   ];
+
+  addAdminUser(input: {
+    name: string;
+    email: string;
+    role: AdminUser['role'];
+    dept: string;
+    status: AdminUser['status'];
+  }): AdminUser {
+    const parts = input.name.trim().split(/\s+/).filter(Boolean);
+    const av = parts.length >= 2
+      ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+      : input.name.slice(0, 2).toUpperCase();
+    const colors = ['#4f8ef7', '#10c27a', '#f97316', '#8b5cf6', '#ec4899', '#14b8a6'];
+    const user: AdminUser = {
+      id: `USR-${String(this.adminUsers.length + 1).padStart(3, '0')}`,
+      av,
+      color: colors[this.adminUsers.length % colors.length],
+      name: input.name.trim(),
+      email: input.email.trim(),
+      role: input.role,
+      dept: input.dept.trim(),
+      status: input.status,
+      lastActive: 'Just now',
+    };
+    this.adminUsers.unshift(user);
+    return user;
+  }
 
   readonly analyticsStats: DashboardStat[] = [
     { icon: 'fa-chart-column', label: 'Requests / Day', value: '263', scColor: '#4f8ef7', iconBg: '#eef4fe', iconColor: '#2563eb', delta: '+11% vs last week', deltaDir: 'up' },

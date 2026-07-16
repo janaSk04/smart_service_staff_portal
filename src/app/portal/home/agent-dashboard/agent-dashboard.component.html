@@ -1,0 +1,131 @@
+<div class="page-title">
+  <h1>Agent Dashboard</h1>
+  <p>Zone 1 — Colombo Central · 18 open requests</p>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card" *ngFor="let stat of stats" [style.--sc-color]="stat.scColor">
+    <div class="sc-icon" [style.background]="stat.iconBg" [style.color]="stat.iconColor">
+      <i class="fa-solid" [ngClass]="stat.icon"></i>
+    </div>
+    <div>
+      <div class="sc-val">{{ stat.value }}</div>
+      <div class="sc-label">{{ stat.label }}</div>
+      <div class="sc-delta" [class.up]="stat.deltaDir === 'up'" [class.down]="stat.deltaDir === 'down'">
+        <i class="fa-solid" [ngClass]="stat.deltaDir === 'up' ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'"></i>
+        {{ stat.delta }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="two-col left-wide">
+  <div class="card">
+    <div class="card-head">
+      <h3>Active Queue</h3>
+      <div class="card-head-actions">
+        <button type="button" class="btn btn-outline btn-sm" (click)="aiAssign()">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> AI Assign
+        </button>
+        <button type="button" class="btn btn-accent btn-sm" (click)="goToRequests()">Full View</button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr><th>ID</th><th>Service</th><th>Customer</th><th>Priority</th><th>Assign To</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of queue">
+            <td class="dt-id">{{ item.id }}</td>
+            <td>{{ item.service }}</td>
+            <td>{{ item.customer }}</td>
+            <td><span class="badge" [ngClass]="priorityBadge(item.priority).cls">{{ priorityBadge(item.priority).label }}</span></td>
+            <td><span class="assign-to">{{ item.assignedTo }}</span></td>
+            <td>
+              <button type="button" class="btn btn-accent btn-sm" (click)="confirmAssign(item)">
+                <i class="fa-solid fa-check"></i> Confirm
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="stack-col">
+    <div class="card">
+      <div class="card-head"><h3>SLA Monitor</h3></div>
+      <div class="sla-row" *ngFor="let sla of slaItems">
+        <div class="sla-row-head">
+          <span>{{ sla.label }}</span>
+          <span class="sla-pct" [style.color]="sla.color">{{ sla.pct }}</span>
+        </div>
+        <div class="pbar">
+          <div class="pbar-fill" [style.width.%]="slaWidth(sla.pct)" [style.background]="sla.color"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>Daily Assignments</h3></div>
+      <div class="chart-area">
+        <div
+          class="chart-bar"
+          *ngFor="let bar of chartBars"
+          [class.highlight]="bar.highlight"
+          [style.height.%]="bar.heightPct"
+          [style.animation-delay]="bar.delay"
+          [title]="bar.value"
+        ></div>
+      </div>
+      <div class="chart-x-labels">
+        <span *ngFor="let label of weekLabels">{{ label }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="two-col">
+  <div class="card">
+    <div class="card-head">
+      <h3>My Technicians</h3>
+      <button type="button" class="card-action" (click)="goToTechnicians()">View All</button>
+    </div>
+    <div class="tech-list">
+      <div class="tech-item" *ngFor="let tech of technicians">
+        <div class="user-avatar" [style.background]="tech.color">{{ tech.av }}</div>
+        <div class="tech-item-info">
+          <strong>{{ tech.name }}</strong>
+          <small>{{ tech.role }}</small>
+        </div>
+        <div class="tech-status-dot" [ngClass]="techStatusDot(tech.status)"></div>
+        <span class="tech-status-label">{{ techStatusLabel(tech.status) }}</span>
+        <div class="tech-load">{{ tech.load }}</div>
+        <button type="button" class="btn btn-outline btn-sm btn-icon" (click)="assignToTech(tech.name)">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Today's Timeline</h3></div>
+    <div class="timeline">
+      <div class="tl-item" *ngFor="let item of timeline">
+        <div class="tl-line-wrap">
+          <div class="tl-dot" [style.background]="item.bg" [style.color]="item.color">
+            <i class="fa-solid" [ngClass]="item.icon"></i>
+          </div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-content">
+          <strong>{{ item.title }}</strong>
+          <span>{{ item.desc }}</span>
+        </div>
+        <div class="tl-time">{{ item.time }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+

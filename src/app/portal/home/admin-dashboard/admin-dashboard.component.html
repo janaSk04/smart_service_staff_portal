@@ -1,0 +1,287 @@
+<div class="page-title">
+  <h1>System Overview</h1>
+  <p>{{ subtitle }}</p>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card" *ngFor="let stat of stats" [style.--sc-color]="stat.scColor">
+    <div class="sc-icon" [style.background]="stat.iconBg" [style.color]="stat.iconColor">
+      <i class="fa-solid" [ngClass]="stat.icon"></i>
+    </div>
+    <div>
+      <div class="sc-val">{{ stat.value }}</div>
+      <div class="sc-label">{{ stat.label }}</div>
+      <div class="sc-delta" [class.up]="stat.deltaDir === 'up'" [class.down]="stat.deltaDir === 'down'">
+        <i class="fa-solid" [ngClass]="stat.deltaDir === 'up' ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'"></i>
+        {{ stat.delta }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="two-col left-wide">
+  <div class="card">
+    <div class="card-head">
+      <h3>Requests This Week</h3>
+      <div class="card-head-actions">
+        <span class="badge badge-blue">Live</span>
+        <button type="button" class="btn btn-ghost btn-sm" (click)="exportChart()">
+          <i class="fa-solid fa-download"></i> Export
+        </button>
+      </div>
+    </div>
+    <div class="chart-area">
+      <div
+        class="chart-bar"
+        *ngFor="let bar of chartBars; let i = index"
+        [class.highlight]="bar.highlight"
+        [style.height.%]="bar.heightPct"
+        [style.animation-delay]="bar.delay"
+        [title]="bar.value"
+      ></div>
+    </div>
+    <div class="chart-x-labels">
+      <span *ngFor="let label of weekLabels">{{ label }}</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Status Breakdown</h3></div>
+    <div class="donut-wrap">
+      <svg class="donut-svg" width="120" height="120" viewBox="0 0 120 120">
+        <circle
+          *ngFor="let arc of donutArcs"
+          cx="60"
+          cy="60"
+          r="46"
+          fill="none"
+          [attr.stroke]="arc.color"
+          stroke-width="14"
+          [attr.stroke-dasharray]="arc.dashArray"
+          [attr.stroke-dashoffset]="arc.dashOffset"
+          stroke-linecap="round"
+        />
+        <circle cx="60" cy="60" r="30" fill="white"/>
+        <text x="60" y="64" text-anchor="middle" font-size="13" font-weight="800" fill="#1a1d2e" font-family="JetBrains Mono">1,842</text>
+      </svg>
+      <div class="donut-legend">
+        <div class="dl-item" *ngFor="let seg of statusDonut">
+          <div class="dl-dot" [style.background]="seg.color"></div>
+          <span class="dl-label">{{ seg.label }}</span>
+          <span class="dl-val">{{ seg.count }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="two-col">
+  <div class="card">
+    <div class="card-head">
+      <h3>Recent Requests</h3>
+      <div class="card-head-actions">
+        <button type="button" class="btn btn-accent btn-sm" (click)="addRequest()">
+          <i class="fa-solid fa-plus"></i> Add
+        </button>
+        <button type="button" class="card-action btn" (click)="goToRequests()">View All</button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr><th>ID</th><th>Service</th><th>Customer</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let req of recentRequests">
+            <td class="dt-id">{{ req.id }}</td>
+            <td>{{ req.service }}</td>
+            <td>{{ req.customer }}</td>
+            <td><span class="badge" [ngClass]="statusBadge(req.status).cls">{{ statusBadge(req.status).label }}</span></td>
+            <td>
+              <div class="flex gap-sm">
+                <button type="button" class="btn btn-ghost btn-sm btn-icon" (click)="viewRequest(req.id)" title="View">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+                <button type="button" class="btn btn-outline btn-sm btn-icon" (click)="editRequest(req.id)" title="Edit">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Activity Feed</h3></div>
+    <div class="activity-feed">
+      <div class="af-item" *ngFor="let item of activities">
+        <div class="af-dot" [style.background]="item.bg" [style.color]="item.color">
+          <i class="fa-solid" [ngClass]="item.icon"></i>
+        </div>
+        <div class="af-content">
+          <strong>{{ item.title }}</strong>
+          <span>{{ item.desc }}</span>
+        </div>
+        <div class="af-time">{{ item.time }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card complaints-card">
+  <div class="card-head">
+    <h3>Customer Complaints</h3>
+    <div class="card-head-actions">
+      <span class="badge badge-red">{{ openComplaintCount }} open</span>
+      <button type="button" class="card-action btn" (click)="goToComplaints()">View All</button>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Customer</th>
+          <th>Request</th>
+          <th>Subject</th>
+          <th>Severity</th>
+          <th>Status</th>
+          <th>Agent</th>
+          <th>When</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of complaints">
+          <td class="dt-id">{{ row.id }}</td>
+          <td>
+            <strong>{{ row.customer }}</strong>
+            <div class="complaint-meta">{{ row.zone }}</div>
+          </td>
+          <td class="dt-id">{{ row.requestId }}</td>
+          <td>
+            <strong>{{ row.subject }}</strong>
+            <div class="complaint-meta">{{ row.service }}</div>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="complaintSeverityBadge(row.severity).cls">
+              {{ complaintSeverityBadge(row.severity).label }}
+            </span>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="complaintStatusBadge(row.status).cls">
+              {{ complaintStatusBadge(row.status).label }}
+            </span>
+          </td>
+          <td>{{ row.agent }}</td>
+          <td>{{ row.createdAt }}</td>
+          <td>
+            <div class="flex gap-sm">
+              <button type="button" class="btn btn-ghost btn-sm btn-icon" (click)="viewComplaint(row)" title="View">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline btn-sm btn-icon"
+                (click)="investigateComplaint(row)"
+                title="Investigate"
+                [disabled]="row.status === 'investigating' || row.status === 'resolved'"
+              >
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline btn-sm btn-icon"
+                (click)="escalateComplaint(row)"
+                title="Escalate"
+                [disabled]="row.status === 'escalated' || row.status === 'resolved'"
+              >
+                <i class="fa-solid fa-arrow-up"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-accent btn-sm btn-icon"
+                (click)="resolveComplaint(row)"
+                title="Resolve"
+                [disabled]="row.status === 'resolved'"
+              >
+                <i class="fa-solid fa-check"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="complaints.length === 0">
+          <td colspan="9" class="complaint-empty">No open customer complaints.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="two-col">
+  <div class="card">
+    <div class="card-head">
+      <h3>Agent Performance</h3>
+      <div class="card-head-actions">
+        <button type="button" class="btn btn-accent btn-sm" (click)="addAgent()">
+          <i class="fa-solid fa-plus"></i> Add
+        </button>
+        <button type="button" class="card-action" (click)="goToAgents()">View All</button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr><th>Agent</th><th>Zone</th><th>Open</th><th>Completion</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let agent of agents">
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar" [style.background]="agent.avColor">{{ agent.av }}</div>
+                <div><strong>{{ agent.name }}</strong></div>
+              </div>
+            </td>
+            <td>{{ agent.zone }}</td>
+            <td><strong>{{ agent.open }}</strong></td>
+            <td>
+              <span class="health-pill" [ngStyle]="healthStyle(agent.health)">{{ agent.pct }}</span>
+            </td>
+            <td>
+              <div class="flex gap-sm">
+                <button type="button" class="btn btn-ghost btn-sm btn-icon" (click)="viewAgent(agent.id)" title="View">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+                <button type="button" class="btn btn-outline btn-sm btn-icon" (click)="editAgent(agent.id)" title="Edit">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h3>Technician Locations</h3>
+      <span class="badge badge-green live-badge">
+        <span class="live-dot"></span> Live
+      </span>
+    </div>
+    <div class="map-placeholder">
+      <div class="map-grid-bg"></div>
+      <div
+        class="map-pin"
+        *ngFor="let pin of mapPins"
+        [style.top]="pin.top"
+        [style.left]="pin.left"
+        [style.animation-delay]="pin.delay"
+      ></div>
+      <span class="map-label">72 technicians on duty</span>
+    </div>
+  </div>
+</div>
