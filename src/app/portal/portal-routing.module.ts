@@ -7,6 +7,9 @@ import { AnalyticsComponent } from './views/analytics/analytics.component';
 import { JobsComponent } from './views/jobs/jobs.component';
 import { RequestsComponent } from './views/requests/requests.component';
 import { ScheduleComponent } from './views/schedule/schedule.component';
+import { UsersComponent } from './views/users/users.component';
+import { ComplaintsComponent } from './views/complaints/complaints.component';
+import { UnderConstructionComponent } from './views/under-construction/under-construction.component';
 
 const routes: Routes = [
   {
@@ -20,6 +23,14 @@ const routes: Routes = [
       { 
         path: 'analytics', 
         component: AnalyticsComponent 
+      },
+      { 
+        path: 'users', 
+        component: UsersComponent 
+      },
+      { 
+        path: 'complaints', 
+        component: ComplaintsComponent 
       },
       { 
         path: 'requests', 
@@ -37,6 +48,10 @@ const routes: Routes = [
       { 
         path: 'schedule', 
         component: ScheduleComponent 
+      },
+      { 
+        path: 'under-construction', 
+        component: UnderConstructionComponent 
       },
     ]
   }

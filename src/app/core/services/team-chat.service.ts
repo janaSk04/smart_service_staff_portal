@@ -170,6 +170,36 @@ export class TeamChatService {
   openChat(chatId: string): void {
     this.activeChatId = chatId;
   }
+  
+  openJobChat(jobId: string, customerName?: string): string {
+    const chatId = this.toJobChatId(jobId);
+    const store = this.readStore();
+    if (!store[chatId]?.length) {
+      store[chatId] = [
+        {
+          id: `m-job-${chatId}`,
+          role: 'user',
+          sender: customerName || 'Customer',
+          type: 'text',
+          text: `Hi, I need an update on ${jobId}.`,
+          time: this.nowShortTime(),
+          status: 'delivered',
+        },
+      ];
+      this.writeStore(store);
+    }
+    this.mode = 'external';
+    this.activeChatId = chatId;
+    return chatId;
+  }
+
+  toJobChatId(jobId: string): string {
+    const id = (jobId || '').trim().toUpperCase();
+    if (/^REQ-\d{4}-\d+$/i.test(id)) return id;
+    const short = id.match(/^REQ-(\d+)$/i);
+    if (short) return `REQ-2026-${short[1]}`;
+    return id.startsWith('REQ-') ? id : `REQ-2026-${id}`;
+  }
 
   sendMessage(text: string, role: StaffRole | null): void {
     if (!text.trim() || !this.activeChatId) return;

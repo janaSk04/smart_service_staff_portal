@@ -11,6 +11,10 @@ import { AnalyticsComponent } from './views/analytics/analytics.component';
 import { JobsComponent } from './views/jobs/jobs.component';
 import { ScheduleComponent } from './views/schedule/schedule.component';
 import { RequestsComponent } from './views/requests/requests.component';
+import { UsersComponent } from './views/users/users.component';
+import { ComplaintsComponent } from './views/complaints/complaints.component';
+import { UnderConstructionComponent } from './views/under-construction/under-construction.component';
+
 
 
 @NgModule({
@@ -19,7 +23,7 @@ import { RequestsComponent } from './views/requests/requests.component';
     ChatComponent,
     AnalyticsComponent,
     ScheduleComponent,
-    RequestsComponent
+    RequestsComponent,
   ],
   imports: [
     CommonModule,
@@ -27,7 +31,10 @@ import { RequestsComponent } from './views/requests/requests.component';
     FormsModule,
     RouterModule,
     HomeComponent,
-    JobsComponent
+    UsersComponent,
+    JobsComponent,
+    ComplaintsComponent,
+    UnderConstructionComponent
   ]
 })
 export class PortalModule { }

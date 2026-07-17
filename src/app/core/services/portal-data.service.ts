@@ -238,10 +238,12 @@ export interface AdminUser {
   color: string;
   name: string;
   email: string;
+  contactNumber: string;
   role: 'Admin' | 'Agent' | 'Technician';
   dept: string;
   status: 'active' | 'inactive';
   lastActive: string;
+  password: string;
 }
 
 export interface ZoneSlaRow {
@@ -292,7 +294,7 @@ export class PortalDataService {
   customerComplaints: CustomerComplaint[] = [
     {
       id: 'CMP-104',
-      customer: 'Priya Mendis',
+      customer: 'Jana janathan',
       phone: '+94 77 234 5678',
       requestId: 'REQ-0341',
       service: 'Garbage Collection',
@@ -301,7 +303,7 @@ export class PortalDataService {
       severity: 'high',
       status: 'open',
       zone: 'Zone 1',
-      agent: 'Nadeesha Silva',
+      agent: 'Krishan svapalan',
       createdAt: '12m ago',
     },
     {
@@ -315,12 +317,12 @@ export class PortalDataService {
       severity: 'critical',
       status: 'escalated',
       zone: 'Zone 1',
-      agent: 'Nadeesha Silva',
+      agent: 'Krishan svapalan',
       createdAt: '45m ago',
     },
     {
       id: 'CMP-102',
-      customer: 'Amara Perera',
+      customer: 'Kamsa Perera',
       phone: '+94 72 345 6789',
       requestId: 'REQ-0350',
       service: 'Pest Control',
@@ -348,7 +350,7 @@ export class PortalDataService {
     },
     {
       id: 'CMP-100',
-      customer: 'Dilshan Rajapaksa',
+      customer: 'Dilaksan Raja',
       phone: '+94 77 888 9900',
       requestId: 'REQ-0342',
       service: 'AC Service',
@@ -357,7 +359,7 @@ export class PortalDataService {
       severity: 'medium',
       status: 'open',
       zone: 'Zone 1',
-      agent: 'Nadeesha Silva',
+      agent: 'Bavitha',
       createdAt: '5h ago',
     },
     {
@@ -371,12 +373,12 @@ export class PortalDataService {
       severity: 'critical',
       status: 'investigating',
       zone: 'Zone 3',
-      agent: 'Dimali W.',
+      agent: 'Bavitha',
       createdAt: 'Yesterday',
     },
     {
       id: 'CMP-098',
-      customer: 'Sunil Jayawardena',
+      customer: 'Sunil Perara',
       phone: '+94 76 555 6677',
       requestId: 'REQ-0371',
       service: 'Garbage Collection',
@@ -385,7 +387,7 @@ export class PortalDataService {
       severity: 'low',
       status: 'resolved',
       zone: 'Zone 2',
-      agent: 'Kasun Perera',
+      agent: 'Krishan svapalan',
       createdAt: 'Yesterday',
     },
   ];
@@ -1099,21 +1101,95 @@ export class PortalDataService {
     return Math.min(100, jobs * 20);
   }
 
-  adminUsers: AdminUser[] = [
-    { id: 'USR-001', av: 'AP', color: '#4f8ef7', name: 'Arjun Perera', email: 'admin@servex.lk', role: 'Admin', dept: 'System', status: 'active', lastActive: 'Just now' },
-    { id: 'USR-002', av: 'NS', color: '#10c27a', name: 'Nadeesha Silva', email: 'agent@servex.lk', role: 'Agent', dept: 'Zone 1', status: 'active', lastActive: '5m ago' },
-    { id: 'USR-003', av: 'RF', color: '#f97316', name: 'Roshan Fernando', email: 'tech@servex.lk', role: 'Technician', dept: 'Zone 1', status: 'active', lastActive: '12m ago' },
-    { id: 'USR-004', av: 'KP', color: '#8b5cf6', name: 'Kasun Perera', email: 'k.perera@servex.lk', role: 'Agent', dept: 'Zone 2', status: 'inactive', lastActive: '2d ago' },
-    { id: 'USR-005', av: 'DT', color: '#ec4899', name: 'Dimali Tissera', email: 'd.tissera@servex.lk', role: 'Technician', dept: 'Zone 3', status: 'active', lastActive: '1h ago' },
-    { id: 'USR-006', av: 'PM', color: '#14b8a6', name: 'Pradeep Madushan', email: 'p.madushan@servex.lk', role: 'Technician', dept: 'Zone 2', status: 'active', lastActive: '30m ago' },
-  ];
+adminUsers: AdminUser[] = [
+  {
+    id: 'USR-001',
+    av: 'AP',
+    color: '#4f8ef7',
+    name: 'Jack Sparrow',
+    email: 'admin@service.lk',
+    contactNumber: '0771234567',
+    password: 'Admin@123',
+    role: 'Admin',
+    dept: 'System',
+    status: 'active',
+    lastActive: 'Just now'
+  },
+  {
+    id: 'USR-002',
+    av: 'NS',
+    color: '#10c27a',
+    name: 'Thivija Thangarasu',
+    email: 'agent@service.lk',
+    contactNumber: '0712345678',
+    password: 'Agent@123',
+    role: 'Agent',
+    dept: 'Zone 1',
+    status: 'active',
+    lastActive: '5m ago'
+  },
+  {
+    id: 'USR-003',
+    av: 'RF',
+    color: '#f97316',
+    name: 'Sasee Raja',
+    email: 'tech@service.lk',
+    contactNumber: '0723456789',
+    password: 'Tech@123',
+    role: 'Technician',
+    dept: 'Zone 1',
+    status: 'active',
+    lastActive: '12m ago'
+  },
+  {
+    id: 'USR-004',
+    av: 'KP',
+    color: '#8b5cf6',
+    name: 'Bavi Perera',
+    email: 'k.perera@service.lk',
+    contactNumber: '0754567890',
+    password: 'Agent@123',
+    role: 'Agent',
+    dept: 'Zone 2',
+    status: 'inactive',
+    lastActive: '2d ago'
+  },
+  {
+    id: 'USR-005',
+    av: 'DT',
+    color: '#ec4899',
+    name: 'Dimali Tissera',
+    email: 'd.tissera@service.lk',
+    contactNumber: '0765678901',
+    password: 'Tech@123',
+    role: 'Technician',
+    dept: 'Zone 3',
+    status: 'active',
+    lastActive: '1h ago'
+  },
+  {
+    id: 'USR-006',
+    av: 'PM',
+    color: '#14b8a6',
+    name: 'Pradeep Ranganathan',
+    email: 'p.madushan@servex.lk',
+    contactNumber: '0786789012',
+    password: 'Tech@123',
+    role: 'Technician',
+    dept: 'Zone 2',
+    status: 'active',
+    lastActive: '30m ago'
+  }
+];
 
   addAdminUser(input: {
     name: string;
     email: string;
+    contactNumber: string;
     role: AdminUser['role'];
     dept: string;
     status: AdminUser['status'];
+    password: string;
   }): AdminUser {
     const parts = input.name.trim().split(/\s+/).filter(Boolean);
     const av = parts.length >= 2
@@ -1126,7 +1202,9 @@ export class PortalDataService {
       color: colors[this.adminUsers.length % colors.length],
       name: input.name.trim(),
       email: input.email.trim(),
+      contactNumber: input.contactNumber.trim(),
       role: input.role,
+      password: input.password,
       dept: input.dept.trim(),
       status: input.status,
       lastActive: 'Just now',

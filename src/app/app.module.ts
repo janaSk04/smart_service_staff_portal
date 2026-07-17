@@ -6,11 +6,16 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './auth/login/login.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { FormModalComponent } from './shared/form-modal/form-modal.component';
+import { AdminModalComponent } from './shared/admin-modal/admin-modal.component';
+import { ToastComponent } from './shared/toast/toast.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent
+    LoginComponent,
+    AdminModalComponent,
+    ToastComponent
   ],
   imports: [
     BrowserModule,

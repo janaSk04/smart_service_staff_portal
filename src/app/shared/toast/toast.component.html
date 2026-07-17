@@ -1,0 +1,10 @@
+<div class="toast-wrap" *ngIf="visible && message">
+  <div class="toast show" role="status" aria-live="polite">
+    <i
+      class="fa-solid"
+      [ngClass]="type === 'error' ? 'fa-circle-xmark' : 'fa-circle-check'"
+      [style.color]="type === 'error' ? '#ef4444' : 'var(--accent)'"
+    ></i>
+    <span>{{ message }}</span>
+  </div>
+</div>

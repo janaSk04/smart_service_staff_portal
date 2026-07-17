@@ -1,0 +1,126 @@
+<div class="dash-view active">
+  <div class="page-title">
+    <h1>Analytics</h1>
+    <p>Operational and performance intelligence</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card" *ngFor="let stat of stats" [style.--sc-color]="stat.scColor">
+      <div class="sc-icon" [style.background]="stat.iconBg" [style.color]="stat.iconColor">
+        <i class="fa-solid" [ngClass]="stat.icon"></i>
+      </div>
+      <div>
+        <div class="sc-val">{{ stat.value }}</div>
+        <div class="sc-label">{{ stat.label }}</div>
+        <div class="sc-delta" [class.up]="stat.deltaDir === 'up'" [class.down]="stat.deltaDir === 'down'">
+          <i class="fa-solid" [ngClass]="stat.deltaDir === 'up' ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'"></i>
+          {{ stat.delta }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col left-wide">
+    <div class="card">
+      <div class="card-head">
+        <h3>Request Trend (Last 14 Days)</h3>
+        <button type="button" class="btn btn-outline btn-sm" (click)="exportTrend()">
+          <i class="fa-solid fa-download"></i> Export
+        </button>
+      </div>
+      <div class="chart-area">
+        <div
+          class="chart-bar"
+          *ngFor="let bar of chartBars"
+          [class.highlight]="bar.highlight"
+          [style.height.%]="bar.heightPct"
+          [style.animation-delay]="bar.delay"
+          [title]="bar.value"
+        ></div>
+      </div>
+      <div class="chart-x-labels">
+        <span *ngFor="let label of trendLabels">{{ label }}</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>Zone SLA Heat</h3></div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Zone</th>
+              <th>Completed</th>
+              <th>Avg ETA</th>
+              <th>SLA</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of zoneSlaRows">
+              <td>{{ row.zone }}</td>
+              <td>{{ row.completed }}</td>
+              <td>{{ row.avgEta }}</td>
+              <td><span class="badge" [ngClass]="row.slaBadge">{{ row.sla }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-head"><h3>Category Mix</h3></div>
+      <div class="donut-wrap">
+        <svg class="donut-svg" width="120" height="120" viewBox="0 0 120 120">
+          <circle
+            *ngFor="let arc of donutArcs"
+            cx="60"
+            cy="60"
+            r="46"
+            fill="none"
+            [attr.stroke]="arc.color"
+            stroke-width="14"
+            [attr.stroke-dasharray]="arc.dashArray"
+            [attr.stroke-dashoffset]="arc.dashOffset"
+            stroke-linecap="round"
+          />
+          <circle cx="60" cy="60" r="30" fill="white"/>
+          <text x="60" y="64" text-anchor="middle" font-size="13" font-weight="800" fill="#1a1d2e" font-family="JetBrains Mono">100%</text>
+        </svg>
+        <div class="donut-legend">
+          <div class="dl-item" *ngFor="let seg of categoryDonut">
+            <div class="dl-dot" [style.background]="seg.color"></div>
+            <span class="dl-label">{{ seg.label }}</span>
+            <span class="dl-val">{{ seg.count }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>Top Technicians (On-time)</h3></div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Technician</th>
+              <th>Jobs</th>
+              <th>On-time</th>
+              <th>Rating</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let tech of topTechnicians">
+              <td>{{ tech.name }}</td>
+              <td>{{ tech.jobs }}</td>
+              <td>{{ tech.onTime }}</td>
+              <td>{{ tech.rating }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
