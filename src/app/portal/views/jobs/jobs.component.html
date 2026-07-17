@@ -1,0 +1,54 @@
+<div class="dash-view active">
+  <div class="page-title">
+    <h1>My Jobs</h1>
+    <p>All jobs assigned to you</p>
+  </div>
+
+  <div class="job-filters">
+    <button
+      type="button"
+      class="btn btn-sm"
+      *ngFor="let filter of filters"
+      [class.btn-accent]="isFilterActive(filter.id)"
+      [class.btn-outline]="!isFilterActive(filter.id)"
+      (click)="setFilter(filter.id)"
+    >{{ filter.label }}</button>
+  </div>
+
+  <div class="job-card" *ngFor="let job of jobs" [style.border-left-color]="job.borderColor">
+    <div class="job-card-head">
+      <div>
+        <div class="job-title">{{ job.service }}</div>
+        <div class="job-id">{{ job.id }}</div>
+      </div>
+      <span class="badge" [ngClass]="job.statusBadge">{{ job.statusLabel }}</span>
+    </div>
+    <div class="job-meta">
+      <div class="job-meta-item"><i class="fa-solid fa-user"></i> {{ job.customer }}</div>
+      <div class="job-meta-item"><i class="fa-solid fa-phone"></i> {{ job.phone }}</div>
+      <div class="job-meta-item"><i class="fa-solid fa-location-dot"></i> {{ job.address }}</div>
+      <div class="job-meta-item"><i class="fa-solid fa-clock"></i> Due: {{ job.due }}</div>
+      <div class="job-meta-item" *ngIf="job.amount"><i class="fa-solid fa-coins"></i> {{ job.amount }}</div>
+    </div>
+    <div class="job-actions">
+      <button type="button" class="btn btn-accent btn-sm" (click)="navigate(job)">
+        <i class="fa-solid fa-map-location-dot"></i> Navigate
+      </button>
+      <button type="button" class="btn btn-outline btn-sm" (click)="canUpdateStatus(job)">
+        <i class="fa-solid fa-play"></i> Update Status
+      </button>
+      <button type="button" class="btn btn-ghost btn-sm" (click)="uploadPhoto(job)">
+        <i class="fa-solid fa-camera"></i> Photo
+      </button>
+      <button type="button" class="btn btn-ghost btn-sm" (click)="openChat(job)">
+        <i class="fa-solid fa-comments"></i> Chat
+      </button>
+    </div>
+  </div>
+
+  <div class="empty-jobs" *ngIf="jobs.length === 0">
+    <i class="fa-solid fa-briefcase"></i>
+    <p>No jobs in this category.</p>
+  </div>
+</div>
+

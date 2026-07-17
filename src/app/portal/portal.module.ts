@@ -18,7 +18,6 @@ import { RequestsComponent } from './views/requests/requests.component';
     ShellComponent,
     ChatComponent,
     AnalyticsComponent,
-    JobsComponent,
     ScheduleComponent,
     RequestsComponent
   ],
@@ -27,7 +26,8 @@ import { RequestsComponent } from './views/requests/requests.component';
     PortalRoutingModule,
     FormsModule,
     RouterModule,
-    HomeComponent
+    HomeComponent,
+    JobsComponent
   ]
 })
 export class PortalModule { }

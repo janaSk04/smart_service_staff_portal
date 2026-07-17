@@ -1,0 +1,174 @@
+<div id="app-shell" *ngIf="user && roleConfig">
+  <div class="sb-overlay" [class.open]="mobileSidebarOpen" (click)="closeMobileSidebar()"></div>
+
+  <aside
+    class="sidebar"
+    [class.collapsed]="sidebarCollapsed"
+    [class.mobile-open]="mobileSidebarOpen"
+  >
+    <div class="sb-header">
+      <div class="sb-logo">
+        <div class="logo-mark sm"><i class="fa-solid fa-bolt"></i></div>
+        <span class="logo-text">Service<strong>One</strong></span>
+      </div>
+      <button type="button" class="sb-collapse-btn" (click)="toggleSidebar()" title="Collapse">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+
+    <div
+      class="sb-role-badge"
+      [style.background]="roleConfig.badgeBg"
+      [style.color]="roleConfig.badgeColor"
+    >{{ roleConfig.label }}</div>
+
+    <nav class="sb-nav">
+      <div class="sb-nav-section" *ngFor="let section of roleConfig.nav">
+        <div class="sb-nav-label">{{ section.section }}</div>
+        <button
+          type="button"
+          class="sb-nav-item"
+          *ngFor="let item of section.items"
+          [id]="'nav-' + item.id"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.id === 'dashboard' }"
+          (click)="onNavClick()"
+        >
+          <i class="fa-solid" [ngClass]="item.icon"></i>
+          <span>{{ item.label }}</span>
+          <span class="sb-badge" *ngIf="item.badge">{{ item.badge }}</span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="sb-user">
+      <div class="sb-user-avatar" [style.background]="user.avatarColor">{{ user.avatar }}</div>
+      <div class="sb-user-info">
+        <strong>{{ user.name }}</strong>
+        <small>{{ user.title }}</small>
+      </div>
+      <button type="button" class="sb-logout-btn" (click)="logout()" title="Logout">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-area">
+    <header class="topbar">
+      <div class="tb-left">
+        <button type="button" class="tb-menu-btn" (click)="toggleSidebar()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="tb-breadcrumb">{{ breadcrumb }}</div>
+      </div>
+      <div class="tb-right">
+        <div class="tb-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search requests, users..." />
+        </div>
+        <button type="button" class="tb-icon-btn tb-search-mobile" (click)="toggleMobileSearch()">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+        <button
+          type="button"
+          class="tb-icon-btn tb-notif-btn"
+          (click)="toggleNotifPanel($event)"
+          [attr.aria-expanded]="notifOpen"
+          aria-label="Notifications"
+        >
+          <i class="fa-solid fa-bell"></i>
+          <span class="tb-badge" *ngIf="notifCount > 0">{{ notifCount }}</span>
+        </button>
+        <a
+          routerLink="/portal/settings"
+          routerLinkActive="active"
+          class="tb-icon-btn tb-gear"
+          aria-label="Settings"
+          title="Settings"
+          (click)="onSettingsClick()"
+        >
+          <i class="fa-solid fa-gear"></i>
+        </a>
+        <div class="tb-profile-wrap">
+          <button
+            type="button"
+            class="tb-avatar-btn"
+            [style.background]="user.avatarColor"
+            (click)="toggleProfileDropdown($event)"
+            [attr.aria-expanded]="profileOpen"
+            aria-label="Account menu"
+          >{{ user.avatar }}</button>
+          <div class="profile-drop" [class.open]="profileOpen" (click)="$event.stopPropagation()">
+            <div class="pd-info">
+              <strong>{{ user.name }}</strong>
+              <small>{{ user.email }}</small>
+            </div>
+            <div class="pd-divider"></div>
+            <button type="button" class="pd-item" (click)="goToProfile()">
+              <i class="fa-solid fa-user"></i> My Profile
+            </button>
+            <button type="button" class="pd-item" (click)="goToSettings()">
+              <i class="fa-solid fa-gear"></i> Settings
+            </button>
+            <div class="pd-divider"></div>
+            <button type="button" class="pd-item pd-danger" (click)="logout()">
+              <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="tb-search-mobile-bar" [class.open]="mobileSearchOpen">
+      <div class="tb-search-mobile-inner">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Search requests, users..." />
+        <button type="button" (click)="toggleMobileSearch()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+
+    <div class="dashboard-area">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+
+  <div
+    class="notif-panel"
+    [class.open]="notifOpen"
+    role="dialog"
+    aria-label="Notifications"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="np-head">
+      <strong>Notifications</strong>
+      <button type="button" (click)="markAllRead()">Mark all read</button>
+      <button type="button" class="np-close" (click)="closeNotifPanel()" aria-label="Close notifications">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="np-list">
+      <div class="np-item" *ngFor="let n of notifications" [class.unread]="n.unread">
+        <div class="np-icon" [style.background]="n.bg" [style.color]="n.color">
+          <i class="fa-solid" [ngClass]="n.icon"></i>
+        </div>
+        <div class="np-item-body">
+          <strong>{{ n.title }}</strong>
+          <p>{{ n.desc }}</p>
+          <small>{{ n.time }}</small>
+        </div>
+      </div>
+      <div class="np-empty" *ngIf="notifications.length === 0">
+        <i class="fa-solid fa-bell-slash"></i>
+        <p>No notifications</p>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="notif-overlay"
+    [class.open]="notifOpen"
+    (click)="closeNotifPanel()"
+  ></div>
+</div>
+
