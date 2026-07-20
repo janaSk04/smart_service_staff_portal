@@ -502,11 +502,11 @@ export class PortalDataService {
   readonly agentChartData = [14, 22, 18, 31, 27, 19, 24];
 
   readonly myTechnicians: TechListItem[] = [
-    { av: 'RF', color: '#f97316', name: 'Roshan Fernando', role: 'Garbage · Zone 1', status: 'available', load: '3 jobs' },
-    { av: 'AW', color: '#4f8ef7', name: 'Amal Wickrama', role: 'Plumbing · Zone 1', status: 'busy', load: '2 jobs' },
-    { av: 'CT', color: '#8b5cf6', name: 'Chamara Tissa', role: 'Cleaning · Zone 1', status: 'available', load: '1 job' },
-    { av: 'NS', color: '#10b981', name: 'Nimal Senevirathna', role: 'Recycling · Zone 1', status: 'busy', load: '4 jobs' },
-    { av: 'KP', color: '#ec4899', name: 'Kasun Perera', role: 'Electrical · Zone 1', status: 'offline', load: '0 jobs' },
+    { av: 'RF', color: '#f97316', name: 'Jana janathan', role: 'Garbage · Zone 1', status: 'available', load: '3 jobs' },
+    { av: 'AW', color: '#4f8ef7', name: 'Krishan siva', role: 'Plumbing · Zone 1', status: 'busy', load: '2 jobs' },
+    { av: 'CT', color: '#8b5cf6', name: 'Thuvarakan siva', role: 'Cleaning · Zone 1', status: 'available', load: '1 job' },
+    { av: 'NS', color: '#10b981', name: 'Pirakavi rasan', role: 'Recycling · Zone 1', status: 'busy', load: '4 jobs' },
+    { av: 'KP', color: '#ec4899', name: 'Piraveen Sekar', role: 'Electrical · Zone 1', status: 'offline', load: '0 jobs' },
   ];
 
   readonly agentTimeline: TimelineItem[] = [

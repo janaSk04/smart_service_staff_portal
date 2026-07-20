@@ -10,6 +10,8 @@ import { ScheduleComponent } from './views/schedule/schedule.component';
 import { UsersComponent } from './views/users/users.component';
 import { ComplaintsComponent } from './views/complaints/complaints.component';
 import { UnderConstructionComponent } from './views/under-construction/under-construction.component';
+import { AssignComponent } from './views/assign/assign.component';
+import { ProfileComponent } from './views/profile/profile.component';
 
 const routes: Routes = [
   {
@@ -36,7 +38,11 @@ const routes: Routes = [
         path: 'requests', 
         component: RequestsComponent 
       },
+      { 
+        path: 'assign', 
+        component: AssignComponent 
 
+      },
       { 
         path: 'chat', 
         component: ChatComponent 
@@ -48,6 +54,10 @@ const routes: Routes = [
       { 
         path: 'schedule', 
         component: ScheduleComponent 
+      },
+      { 
+        path: 'profile', 
+        component: ProfileComponent 
       },
       { 
         path: 'under-construction', 

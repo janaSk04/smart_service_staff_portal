@@ -1,0 +1,28 @@
+.card-head-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.assign-select {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.55rem;
+  font-family: var(--font);
+  font-size: 0.82rem;
+  color: var(--text2);
+  background: #fff;
+  min-width: 150px;
+}
+
+.assign-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.empty-cell {
+  text-align: center;
+  color: var(--text3);
+  padding: 2rem 1rem !important;
+}

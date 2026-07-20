@@ -1,0 +1,128 @@
+<div class="dash-view active">
+  <div class="page-title">
+    <h1>{{ pageTitle }}</h1>
+    <p>{{ pageSubtitle }}</p>
+  </div>
+
+  <div class="team-chat-shell" *ngIf="activeChannel; else noChannels">
+    <div class="team-chat-sidebar">
+      <div class="team-chat-mode">
+        <button
+          type="button"
+          class="team-chat-chip"
+          [class.active]="chat.mode === 'internal'"
+          (click)="switchMode('internal')"
+        >
+        <i class="fa-solid fa-building-user"></i> Internal
+        </button>
+        <button
+          type="button"
+          class="team-chat-chip"
+          [class.active]="chat.mode === 'external'"
+          (click)="switchMode('external')"
+        >
+          <i class="fa-solid" [ngClass]="chat.modeIconB(role)"></i> {{ chat.modeLabelB(role) }}
+        </button>
+      </div>
+      <div class="team-chat-list">
+        <button
+          type="button"
+          class="team-chat-item"
+          *ngFor="let channel of channels"
+          [class.active]="channel.id === chat.activeChatId"
+          (click)="openChat(channel.id)"
+        >
+          <div class="team-chat-avatar">{{ channel.avatar }}</div>
+          <div class="team-chat-meta">
+            <strong>{{ channel.title }}</strong>
+            <span>{{ channel.subtitle }}</span>
+          </div>
+          <span class="team-chat-unread" *ngIf="channel.unread">{{ channel.unread }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="team-chat-main">
+      <div class="team-chat-head">
+        <div class="team-chat-user">
+          <div class="team-chat-avatar lg">{{ activeChannel.avatar }}</div>
+          <div>
+            <strong>{{ activeChannel.title }}</strong>
+            <small>{{ chat.channelSubtitle(role) }} · {{ activeChannel.participants.join(', ') }}</small>
+          </div>
+        </div>
+        <div class="team-chat-actions">
+          <button type="button" class="btn btn-outline btn-sm" (click)="startAudioCall()">
+            <i class="fa-solid fa-phone"></i> Audio
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" (click)="startVideoCall()">
+            <i class="fa-solid fa-video"></i> Video
+          </button>
+        </div>
+      </div>
+
+      <div class="team-chat-callbar" *ngIf="showCallBar">
+        <span><i class="fa-solid" [ngClass]="callIcon()"></i> {{ callLabel() }}</span>
+        <button type="button" class="btn btn-sm btn-danger" (click)="endCall()">
+          <i class="fa-solid fa-phone-slash"></i> End
+        </button>
+      </div>
+
+      <div class="team-chat-body" #chatBody>
+        <div
+          class="team-chat-msg"
+          *ngFor="let msg of messages"
+          [class.self]="displayRole(msg) === 'self'"
+          [class.other]="displayRole(msg) === 'other'"
+        >
+          <div class="team-chat-bubble">
+            <div class="team-chat-doc" *ngIf="msg.type === 'document'">
+              <i class="fa-solid fa-file-lines"></i>
+              <span>{{ msg.fileName || 'Document' }}</span>
+            </div>
+            <div class="team-chat-voice" *ngIf="msg.type === 'voice'">
+              <i class="fa-solid fa-wave-square"></i>
+              <span>{{ msg.text || 'Voice note' }}</span>
+            </div>
+            <ng-container *ngIf="msg.type === 'text'">{{ msg.text }}</ng-container>
+          </div>
+          <div class="team-chat-time">
+            {{ msg.sender }} · {{ msg.time }}
+            <ng-container *ngIf="displayRole(msg) === 'self'"> · {{ receiptText(msg.status) }}</ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="team-chat-compose" *ngIf="activeChannel.id !== 'ch-tech-empty'">
+        <input type="file" #fileInput hidden accept=".pdf,.doc,.docx,.txt,image/*" (change)="onFileSelected($event)" />
+        <button type="button" class="btn btn-outline btn-sm" (click)="fileInput.click()">
+          <i class="fa-solid fa-paperclip"></i> Document
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline btn-sm"
+          [class.recording]="chat.recordingVoiceNote"
+          (click)="toggleVoiceNote()"
+        >
+          <i class="fa-solid fa-microphone"></i> {{ chat.recordingVoiceNote ? 'Stop' : 'Voice Note' }}
+        </button>
+        <input
+          type="text"
+          [(ngModel)]="messageText"
+          placeholder="Type message for {{ activeChannel.title }}..."
+          (keydown.enter)="sendMessage()"
+        />
+        <button type="button" class="btn btn-accent btn-sm" (click)="sendMessage()">
+          <i class="fa-solid fa-paper-plane"></i> Send
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noChannels>
+    <div class="card" style="text-align:center;padding:3rem">
+      <i class="fa-solid fa-comments" style="font-size:2.5rem;color:var(--accent);margin-bottom:1rem;display:block"></i>
+      <h3>No channels available</h3>
+    </div>
+  </ng-template>
+</div>

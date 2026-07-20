@@ -14,6 +14,8 @@ import { RequestsComponent } from './views/requests/requests.component';
 import { UsersComponent } from './views/users/users.component';
 import { ComplaintsComponent } from './views/complaints/complaints.component';
 import { UnderConstructionComponent } from './views/under-construction/under-construction.component';
+import { AssignComponent } from './views/assign/assign.component';
+import { ProfileComponent } from './views/profile/profile.component';
 
 
 
@@ -24,6 +26,7 @@ import { UnderConstructionComponent } from './views/under-construction/under-con
     AnalyticsComponent,
     ScheduleComponent,
     RequestsComponent,
+
   ],
   imports: [
     CommonModule,
@@ -34,6 +37,8 @@ import { UnderConstructionComponent } from './views/under-construction/under-con
     UsersComponent,
     JobsComponent,
     ComplaintsComponent,
+    AssignComponent,
+    ProfileComponent,
     UnderConstructionComponent
   ]
 })

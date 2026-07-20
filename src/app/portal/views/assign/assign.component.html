@@ -1,0 +1,104 @@
+<div class="dash-view active">
+  <div class="page-title">
+    <h1>Assignments</h1>
+    <p>Manage request assignments</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card" *ngFor="let stat of stats" [style.--sc-color]="stat.scColor">
+      <div class="sc-icon" [style.background]="stat.iconBg" [style.color]="stat.iconColor">
+        <i class="fa-solid" [ngClass]="stat.icon"></i>
+      </div>
+      <div>
+        <div class="sc-val">{{ stat.value }}</div>
+        <div class="sc-label">{{ stat.label }}</div>
+        <div class="sc-delta" [class.up]="stat.deltaDir === 'up'" [class.down]="stat.deltaDir === 'down'">
+          <i class="fa-solid" [ngClass]="stat.deltaDir === 'up' ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'"></i>
+          {{ stat.delta }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h3>Assignment Queue</h3>
+      <div class="card-head-actions">
+        <button type="button" class="btn btn-outline btn-sm" (click)="aiAssign()">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> AI Assign
+        </button>
+        <button
+          type="button"
+          class="btn btn-sm"
+          [class.btn-accent]="isTabActive('pending')"
+          [class.btn-outline]="!isTabActive('pending')"
+          (click)="setTab('pending')"
+        >Pending</button>
+        <button
+          type="button"
+          class="btn btn-sm"
+          [class.btn-accent]="isTabActive('confirmed')"
+          [class.btn-outline]="!isTabActive('confirmed')"
+          (click)="setTab('confirmed')"
+        >Confirmed</button>
+        <button
+          type="button"
+          class="btn btn-sm"
+          [class.btn-accent]="isTabActive('all')"
+          [class.btn-outline]="!isTabActive('all')"
+          (click)="setTab('all')"
+        >All</button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Service</th>
+            <th>Customer</th>
+            <th>Priority</th>
+            <th>Assign To</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of filteredRows">
+            <td class="dt-id">{{ row.id }}</td>
+            <td>{{ row.service }}</td>
+            <td>{{ row.customer }}</td>
+            <td><span class="badge" [ngClass]="priorityBadge(row.priority).cls">{{ priorityBadge(row.priority).label }}</span></td>
+            <td>
+              <select class="assign-select" [(ngModel)]="row.assignedTo">
+                <option *ngFor="let tech of technicians" [value]="tech">{{ tech }}</option>
+              </select>
+            </td>
+            <td>
+              <button
+                type="button"
+                class="btn btn-accent btn-sm"
+                *ngIf="!row.confirmed"
+                (click)="confirmAssign(row)"
+              >
+                <i class="fa-solid fa-check"></i> Confirm
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline btn-sm"
+                *ngIf="row.confirmed"
+                (click)="reassign(row)"
+              >
+                <i class="fa-solid fa-arrows-spin"></i> Reassign
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredRows.length === 0">
+            <td colspan="6" class="empty-cell">No assignments in this queue</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
