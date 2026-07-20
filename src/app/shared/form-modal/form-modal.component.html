@@ -1,0 +1,25 @@
+<div class="form-modal-overlay" [class.open]="open" (click)="onOverlayClick($event)">
+  <div class="form-modal form-modal-landscape" role="dialog" [attr.aria-label]="title" (click)="$event.stopPropagation()">
+    <div class="form-modal-head">
+      <div>
+        <h3>{{ title }}</h3>
+        <p *ngIf="subtitle">{{ subtitle }}</p>
+      </div>
+      <button type="button" class="form-modal-close" (click)="close()" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="form-modal-body">
+      <ng-content></ng-content>
+    </div>
+
+    <div class="form-modal-foot">
+      <button type="button" class="btn btn-outline" (click)="close()">Cancel</button>
+      <button type="button" class="btn btn-accent" [disabled]="saving" (click)="onSave()">
+        <i class="fa-solid fa-save"></i> {{ saving ? 'Saving...' : saveLabel }}
+      </button>
+    </div>
+  </div>
+</div>
+

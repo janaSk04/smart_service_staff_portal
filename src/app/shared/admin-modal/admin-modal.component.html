@@ -1,0 +1,13 @@
+<div class="admin-modal-overlay" [class.open]="open" (click)="close($event)">
+  <div class="admin-modal" (click)="$event.stopPropagation()">
+    <div class="admin-modal-head">
+      <h3>{{ title }}</h3>
+      <button type="button" class="admin-modal-close" (click)="close()" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="admin-modal-body" [innerHTML]="bodyHtml"></div>
+    <div class="admin-modal-foot" [innerHTML]="footHtml"></div>
+  </div>
+</div>
+
