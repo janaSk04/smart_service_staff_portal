@@ -1,0 +1,206 @@
+<div class="dash-view active">
+  <div class="page-title">
+    <h1>Customer Complaints</h1>
+    <p>{{ pageSubtitle }}</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h3>Complaints</h3>
+      <div class="card-head-actions">
+        <button
+          type="button"
+          class="btn btn-sm"
+          *ngFor="let filter of filters"
+          [class.btn-accent]="isFilterActive(filter.id)"
+          [class.btn-outline]="!isFilterActive(filter.id)"
+          (click)="setFilter(filter.id)"
+        >{{ filter.label }}</button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Request</th>
+            <th>Subject</th>
+            <th>Severity</th>
+            <th>Status</th>
+            <th *ngIf="role === 'admin'">Agent / Zone</th>
+            <th>When</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of pagedComplaints">
+            <td class="dt-id">{{ row.id }}</td>
+            <td>
+              <strong>{{ row.customer }}</strong>
+              <div class="row-meta">{{ row.phone }}</div>
+            </td>
+            <td class="dt-id">{{ row.requestId }}</td>
+            <td>
+              <strong>{{ row.subject }}</strong>
+              <div class="row-meta">{{ row.service }}</div>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="severityBadge(row.severity).cls">
+                {{ severityBadge(row.severity).label }}
+              </span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="statusBadge(row.status).cls">
+                {{ statusBadge(row.status).label }}
+              </span>
+            </td>
+            <td *ngIf="role === 'admin'">
+              <strong>{{ row.agent }}</strong>
+              <div class="row-meta">{{ row.zone }}</div>
+            </td>
+            <td>{{ row.createdAt }}</td>
+            <td>
+              <div class="table-actions">
+                <button type="button" class="btn btn-ghost btn-sm btn-icon" (click)="openDetail(row)" title="View details">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline btn-sm btn-icon"
+                  (click)="investigate(row)"
+                  title="Investigate"
+                  [disabled]="row.status === 'investigating' || row.status === 'resolved'"
+                >
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline btn-sm btn-icon"
+                  (click)="escalate(row)"
+                  title="Escalate"
+                  [disabled]="row.status === 'escalated' || row.status === 'resolved'"
+                >
+                  <i class="fa-solid fa-arrow-up"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-accent btn-sm btn-icon"
+                  (click)="resolve(row)"
+                  title="Resolve"
+                  [disabled]="row.status === 'resolved'"
+                >
+                  <i class="fa-solid fa-check"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filteredComplaints.length === 0">
+            <td [attr.colspan]="role === 'admin' ? 9 : 8" class="empty-cell">No complaints found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-pagination" *ngIf="showPagination">
+      <button type="button" class="btn btn-outline btn-sm" [disabled]="page === 1" (click)="prevPage()">
+        <i class="fa-solid fa-chevron-left"></i> Prev
+      </button>
+      <span>Page {{ page }} of {{ totalPages }}</span>
+      <button type="button" class="btn btn-outline btn-sm" [disabled]="page === totalPages" (click)="nextPage()">
+        Next <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Complaint detail popup -->
+<div class="complaint-overlay" *ngIf="detailOpen && selected" (click)="closeDetail()">
+  <div class="complaint-detail-card" (click)="$event.stopPropagation()" role="dialog" aria-label="Complaint details">
+    <div class="complaint-detail-head">
+      <div>
+        <h3>Complaint Details</h3>
+        <p>{{ selected.id }} · {{ selected.createdAt }}</p>
+      </div>
+      <button type="button" class="complaint-detail-close" (click)="closeDetail()" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="complaint-badges">
+      <span class="badge" [ngClass]="severityBadge(selected.severity).cls">
+        {{ severityBadge(selected.severity).label }}
+      </span>
+      <span class="badge" [ngClass]="statusBadge(selected.status).cls">
+        {{ statusBadge(selected.status).label }}
+      </span>
+    </div>
+
+    <div class="complaint-detail-grid">
+      <div class="detail-item">
+        <span class="detail-label">Customer</span>
+        <strong>{{ selected.customer }}</strong>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Phone</span>
+        <strong>{{ selected.phone }}</strong>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Request</span>
+        <strong class="dt-id">{{ selected.requestId }}</strong>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Service</span>
+        <strong>{{ selected.service }}</strong>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Zone</span>
+        <strong>{{ selected.zone }}</strong>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Assigned Agent</span>
+        <strong>{{ selected.agent }}</strong>
+      </div>
+    </div>
+
+    <div class="detail-block">
+      <span class="detail-label">Subject</span>
+      <strong>{{ selected.subject }}</strong>
+    </div>
+
+    <div class="detail-block">
+      <span class="detail-label">Complaint Details</span>
+      <p>{{ selected.detail }}</p>
+    </div>
+
+    <div class="complaint-detail-actions">
+      <button
+        type="button"
+        class="btn btn-outline btn-sm"
+        (click)="investigate(selected)"
+        [disabled]="selected.status === 'investigating' || selected.status === 'resolved'"
+      >
+        <i class="fa-solid fa-magnifying-glass"></i> Investigate
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline btn-sm"
+        (click)="escalate(selected)"
+        [disabled]="selected.status === 'escalated' || selected.status === 'resolved'"
+      >
+        <i class="fa-solid fa-arrow-up"></i> Escalate
+      </button>
+      <button
+        type="button"
+        class="btn btn-accent btn-sm"
+        (click)="resolve(selected)"
+        [disabled]="selected.status === 'resolved'"
+      >
+        <i class="fa-solid fa-check"></i> Resolve
+      </button>
+      <button type="button" class="btn btn-ghost btn-sm" (click)="closeDetail()">Close</button>
+    </div>
+  </div>
+</div>
+

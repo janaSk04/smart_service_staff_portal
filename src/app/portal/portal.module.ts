@@ -16,6 +16,8 @@ import { ComplaintsComponent } from './views/complaints/complaints.component';
 import { UnderConstructionComponent } from './views/under-construction/under-construction.component';
 import { AssignComponent } from './views/assign/assign.component';
 import { ProfileComponent } from './views/profile/profile.component';
+import { SettingsComponent } from './views/settings/settings.component';
+import { TechniciansComponent } from './views/technicians/technicians.component';
 
 
 
@@ -39,6 +41,8 @@ import { ProfileComponent } from './views/profile/profile.component';
     ComplaintsComponent,
     AssignComponent,
     ProfileComponent,
+    SettingsComponent,
+    TechniciansComponent,
     UnderConstructionComponent
   ]
 })

@@ -1,7 +1,7 @@
 <div class="dash-view active">
   <div class="page-title">
     <h1>My Jobs</h1>
-    <p>All jobs assigned to you</p>
+    <p>Accept or reject new jobs, then update status as you work</p>
   </div>
 
   <div class="job-filters">
@@ -21,23 +21,69 @@
         <div class="job-title">{{ job.service }}</div>
         <div class="job-id">{{ job.id }}</div>
       </div>
-      <span class="badge" [ngClass]="job.statusBadge">{{ job.statusLabel }}</span>
+      <div class="job-head-badges">
+        <span class="badge" [ngClass]="priorityBadge(job.priority)">{{ priorityLabel(job.priority) }}</span>
+        <span class="badge" [ngClass]="job.statusBadge">{{ job.statusLabel }}</span>
+      </div>
     </div>
+
     <div class="job-meta">
+      <div class="job-meta-item"><i class="fa-solid fa-layer-group"></i> {{ job.category }}</div>
+      <div class="job-meta-item"><i class="fa-solid fa-flag"></i> Priority: {{ priorityLabel(job.priority) }}</div>
       <div class="job-meta-item"><i class="fa-solid fa-user"></i> {{ job.customer }}</div>
       <div class="job-meta-item"><i class="fa-solid fa-phone"></i> {{ job.phone }}</div>
       <div class="job-meta-item"><i class="fa-solid fa-location-dot"></i> {{ job.address }}</div>
       <div class="job-meta-item"><i class="fa-solid fa-clock"></i> Due: {{ job.due }}</div>
       <div class="job-meta-item" *ngIf="job.amount"><i class="fa-solid fa-coins"></i> {{ job.amount }}</div>
     </div>
+
+    <div class="job-reason" *ngIf="job.statusReason">
+      <i class="fa-solid fa-comment-dots"></i>
+      <span><strong>Reason:</strong> {{ job.statusReason }}</span>
+    </div>
+
     <div class="job-actions">
-      <button type="button" class="btn btn-accent btn-sm" (click)="navigate(job)">
+      <button type="button" class="btn btn-accent btn-sm" (click)="navigate(job)" [disabled]="job.status === 'rejected' || job.status === 'done'">
         <i class="fa-solid fa-map-location-dot"></i> Navigate
       </button>
-      <button type="button" class="btn btn-outline btn-sm" (click)="canUpdateStatus(job)">
-        <i class="fa-solid fa-play"></i> Update Status
-      </button>
-      <button type="button" class="btn btn-ghost btn-sm" (click)="uploadPhoto(job)">
+
+      <!-- Pending: Accept or Reject -->
+      <ng-container *ngIf="isPendingDecision(job)">
+        <button type="button" class="btn btn-accent btn-sm" (click)="acceptJob(job)">
+          <i class="fa-solid fa-check"></i> Accept
+        </button>
+        <button type="button" class="btn btn-ghost btn-sm job-reject-btn" (click)="openRejectModal(job)">
+          <i class="fa-solid fa-ban"></i> Reject
+        </button>
+      </ng-container>
+
+      <!-- Accepted only: Update Status (+ Reject until done) -->
+      <ng-container *ngIf="canUpdateStatus(job)">
+        <button type="button" class="btn btn-outline btn-sm" (click)="openStatusModal(job)">
+          <i class="fa-solid fa-arrows-rotate"></i> Update Status
+        </button>
+        <button
+          type="button"
+          class="btn btn-ghost btn-sm job-reject-btn"
+          (click)="openRejectModal(job)"
+          [disabled]="job.status === 'done'"
+        >
+          <i class="fa-solid fa-ban"></i> Reject
+        </button>
+      </ng-container>
+
+      <!-- Rejected tab: Reassign or Redo -->
+      <ng-container *ngIf="job.status === 'rejected'">
+        <button type="button" class="btn btn-outline btn-sm" (click)="reassignJob(job)" [disabled]="job.reassignRequested">
+          <i class="fa-solid fa-user-group"></i>
+          {{ job.reassignRequested ? 'Reassign Requested' : 'Reassign' }}
+        </button>
+        <button type="button" class="btn btn-accent btn-sm" (click)="redoJob(job)">
+          <i class="fa-solid fa-rotate-left"></i> Redo
+        </button>
+      </ng-container>
+
+      <button type="button" class="btn btn-ghost btn-sm" (click)="uploadPhoto(job)" [disabled]="job.status === 'rejected'">
         <i class="fa-solid fa-camera"></i> Photo
       </button>
       <button type="button" class="btn btn-ghost btn-sm" (click)="openChat(job)">
@@ -52,3 +98,71 @@
   </div>
 </div>
 
+<!-- Status / Reject modal -->
+<div class="job-modal-overlay" *ngIf="modalOpen" (click)="closeModal()">
+  <div class="job-modal" (click)="$event.stopPropagation()" role="dialog" [attr.aria-label]="modalTitle">
+    <div class="job-modal-head">
+      <div>
+        <h3>{{ modalTitle }}</h3>
+        <p *ngIf="selectedJob">
+          {{ selectedJob.id }} · {{ selectedJob.service }}
+          · {{ selectedJob.category }}
+          · {{ priorityLabel(selectedJob.priority) }}
+        </p>
+      </div>
+      <button type="button" class="job-modal-close" (click)="closeModal()" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="job-modal-body">
+      <ng-container *ngIf="modalMode === 'status'">
+        <label class="job-modal-label">Select status</label>
+        <div class="status-grid">
+          <button
+            type="button"
+            class="status-option"
+            *ngFor="let opt of statusOptions"
+            [class.active]="selectedStatus === opt.id"
+            (click)="selectStatus(opt.id)"
+          >
+            <i class="fa-solid" [ngClass]="opt.icon"></i>
+            <span>{{ opt.label }}</span>
+          </button>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="modalMode === 'reject'">
+        <div class="reject-note">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span>Rejecting will notify the agent. A reason is required.</span>
+        </div>
+      </ng-container>
+
+      <div class="reason-block" *ngIf="statusNeedsReason()">
+        <label class="job-modal-label" for="job-reason">{{ reasonLabel }} <em>*</em></label>
+        <textarea
+          id="job-reason"
+          rows="4"
+          [(ngModel)]="reason"
+          [placeholder]="reasonPlaceholder"
+          name="jobReason"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="job-modal-foot">
+      <button type="button" class="btn btn-outline" (click)="closeModal()">Cancel</button>
+      <button
+        type="button"
+        class="btn"
+        [class.btn-accent]="modalMode === 'status'"
+        [class.btn-danger]="modalMode === 'reject'"
+        (click)="confirmModal()"
+      >
+        <i class="fa-solid" [ngClass]="modalMode === 'reject' ? 'fa-ban' : 'fa-check'"></i>
+        {{ modalMode === 'reject' ? 'Reject Job' : 'Save Status' }}
+      </button>
+    </div>
+  </div>
+</div>
