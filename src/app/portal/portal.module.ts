@@ -18,6 +18,11 @@ import { AssignComponent } from './views/assign/assign.component';
 import { ProfileComponent } from './views/profile/profile.component';
 import { SettingsComponent } from './views/settings/settings.component';
 import { TechniciansComponent } from './views/technicians/technicians.component';
+import { AgentsComponent } from './views/agents/agents.component';
+import { AuditComponent } from './views/audit/audit.component';
+import { HistoryComponent } from './views/history/history.component';
+import { ServicesComponent } from './views/services/services.component';
+import { ReportsComponent } from './views/reports/reports.component';
 
 
 
@@ -28,7 +33,6 @@ import { TechniciansComponent } from './views/technicians/technicians.component'
     AnalyticsComponent,
     ScheduleComponent,
     RequestsComponent,
-
   ],
   imports: [
     CommonModule,
@@ -43,6 +47,11 @@ import { TechniciansComponent } from './views/technicians/technicians.component'
     ProfileComponent,
     SettingsComponent,
     TechniciansComponent,
+    ServicesComponent,
+    AgentsComponent,
+    AuditComponent,
+    ReportsComponent,
+    HistoryComponent,
     UnderConstructionComponent
   ]
 })

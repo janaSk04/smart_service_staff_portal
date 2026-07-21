@@ -14,6 +14,11 @@ import { AssignComponent } from './views/assign/assign.component';
 import { ProfileComponent } from './views/profile/profile.component';
 import { SettingsComponent } from './views/settings/settings.component';
 import { TechniciansComponent } from './views/technicians/technicians.component';
+import { AgentsComponent } from './views/agents/agents.component';
+import { HistoryComponent } from './views/history/history.component';
+import { AuditComponent } from './views/audit/audit.component';
+import { ServicesComponent } from './views/services/services.component';
+import { ReportsComponent } from './views/reports/reports.component';
 
 const routes: Routes = [
   {
@@ -31,6 +36,10 @@ const routes: Routes = [
       { 
         path: 'users', 
         component: UsersComponent 
+      },
+      { 
+        path: 'agents', 
+        component: AgentsComponent 
       },
       { 
         path: 'technicians', 
@@ -58,6 +67,10 @@ const routes: Routes = [
         component: JobsComponent 
       },
       { 
+        path: 'services', 
+        component: ServicesComponent 
+      },
+      { 
         path: 'schedule', 
         component: ScheduleComponent 
       },
@@ -68,6 +81,18 @@ const routes: Routes = [
       { 
         path: 'settings', 
         component: SettingsComponent 
+      },
+      { 
+        path: 'audit', 
+        component: AuditComponent 
+      },
+      { 
+        path: 'reports', 
+        component: ReportsComponent 
+      },
+      { 
+        path: 'history', 
+        component: HistoryComponent 
       },
       { 
         path: 'under-construction', 
