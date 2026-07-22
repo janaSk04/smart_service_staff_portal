@@ -1,0 +1,95 @@
+<div class="dash-view active">
+  <div class="page-title">
+    <h1>Agents</h1>
+    <p>Manage service agents and zones</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h3>All Agents ({{ agents.length }})</h3>
+      <button type="button" class="btn btn-accent btn-sm" (click)="openAddModal()">
+        <i class="fa-solid fa-plus"></i> Add Agent
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Agent</th>
+            <th>Zone</th>
+            <th>Open</th>
+            <th>Completion</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let agent of pagedAgents">
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar" [style.background]="agent.avColor">{{ agent.av }}</div>
+                <div><strong>{{ agent.name }}</strong></div>
+              </div>
+            </td>
+            <td>{{ agent.zone }}</td>
+            <td><strong>{{ agent.open }}</strong></td>
+            <td>
+              <span class="health-pill" [ngStyle]="healthStyle(agent.health)">{{ agent.pct }}</span>
+            </td>
+            <td>
+              <div class="table-actions">
+                <button type="button" class="btn btn-ghost btn-sm btn-icon" (click)="viewAgent(agent.id)" title="View">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+                <button type="button" class="btn btn-outline btn-sm btn-icon" (click)="editAgent(agent.id)" title="Edit">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="agents.length === 0">
+            <td colspan="5" class="empty-cell">No agents</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-pagination" *ngIf="agents.length">
+      <button type="button" class="btn btn-outline btn-sm" [disabled]="page === 1" (click)="prevPage()">
+        <i class="fa-solid fa-chevron-left"></i> Prev
+      </button>
+      <span>Page {{ page }} of {{ totalPages }}</span>
+      <button type="button" class="btn btn-outline btn-sm" [disabled]="page === totalPages" (click)="nextPage()">
+        Next <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<app-form-modal
+  [open]="showAddModal"
+  (openChange)="showAddModal = $event"
+  title="Add Agent"
+  subtitle="Register a new service agent"
+  saveLabel="Save Agent"
+  (save)="saveAgent()"
+  (cancel)="closeAddModal()"
+>
+  <div class="form-grid">
+    <div class="form-field">
+      <label for="agent-name">Full Name <em>*</em></label>
+      <input id="agent-name" type="text" [(ngModel)]="agentForm.name" name="agentName" placeholder="e.g. Nadeesha Silva" />
+    </div>
+    <div class="form-field">
+      <label for="agent-zone">Zone <em>*</em></label>
+      <select id="agent-zone" [(ngModel)]="agentForm.zone" name="agentZone">
+        <option *ngFor="let zone of zones" [value]="zone">{{ zone }}</option>
+      </select>
+    </div>
+    <div class="form-field full">
+      <label for="agent-email">Email (optional)</label>
+      <input id="agent-email" type="email" [(ngModel)]="agentForm.email" name="agentEmail" placeholder="agent@servex.lk" />
+    </div>
+  </div>
+</app-form-modal>
+

@@ -1,0 +1,28 @@
+.health-pill {
+  padding: 0.2rem 0.6rem;
+  border-radius: 50px;
+  font-size: 0.73rem;
+  font-weight: 700;
+}
+
+.table-actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.empty-cell {
+  text-align: center;
+  color: var(--text3);
+  padding: 2rem 1rem !important;
+}
+
+.table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  color: var(--text2);
+}
