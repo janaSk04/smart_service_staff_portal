@@ -1,0 +1,72 @@
+<div class="dash-view active">
+  <div class="page-title">
+    <h1>Audit Logs</h1>
+    <p>Track sensitive changes and platform actions</p>
+  </div>
+
+  <div class="card audit-filters-card">
+    <div class="card-head">
+      <h3>Filters</h3>
+      <div class="card-head-actions">
+        <select class="audit-filter-select" [(ngModel)]="severityFilter" (ngModelChange)="onFilterChange()">
+          <option value="all">All Severity</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+        <button type="button" class="btn btn-outline btn-sm" (click)="exportCsv()">
+          <i class="fa-solid fa-download"></i> Export CSV
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Log ID</th>
+            <th>Actor</th>
+            <th>Role</th>
+            <th>Action</th>
+            <th>Entity</th>
+            <th>Severity</th>
+            <th>Time</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of pagedLogs">
+            <td class="dt-id">{{ log.id }}</td>
+            <td>{{ log.actor }}</td>
+            <td>{{ log.role }}</td>
+            <td>{{ log.action }}</td>
+            <td>{{ log.entity }}</td>
+            <td><span class="badge" [ngClass]="severityBadge(log.severity)">{{ log.severity }}</span></td>
+            <td>{{ log.time }}</td>
+            <td>
+              <button type="button" class="btn btn-ghost btn-sm btn-icon" (click)="viewLog(log.id)" title="View">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="logs.length === 0">
+            <td colspan="8" class="empty-cell">No audit logs found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-pagination" *ngIf="logs.length">
+      <button type="button" class="btn btn-outline btn-sm" [disabled]="page === 1" (click)="prevPage()">
+        <i class="fa-solid fa-chevron-left"></i> Prev
+      </button>
+      <span>Page {{ page }} of {{ totalPages }}</span>
+      <button type="button" class="btn btn-outline btn-sm" [disabled]="page === totalPages" (click)="nextPage()">
+        Next <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
