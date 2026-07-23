@@ -1,0 +1,267 @@
+<div class="dash-view active">
+  <div class="page-title">
+    <h1>Schedule</h1>
+    <p>{{ periodLabel }}</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head schedule-toolbar">
+      <div class="schedule-nav">
+        <button type="button" class="btn btn-outline btn-sm" (click)="prevPeriod()">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <span class="schedule-month">{{ periodLabel }}</span>
+        <button type="button" class="btn btn-outline btn-sm" (click)="nextPeriod()">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+      <div class="schedule-views">
+        <button
+          type="button"
+          class="btn btn-sm"
+          *ngFor="let mode of viewModes"
+          [class.btn-accent]="viewMode === mode"
+          [class.btn-outline]="viewMode !== mode"
+          (click)="setViewMode(mode)"
+        >{{ mode | titlecase }}</button>
+      </div>
+    </div>
+
+    <!-- Day view: click a slot → job detail popup -->
+    <div class="cal-day-view" *ngIf="viewMode === 'day'">
+      <div class="cal-day-panel" [class.cal-day-today]="dayIsToday">
+        <div class="cal-day-panel-head">
+          <div class="cal-day-num" [class.today]="dayIsToday">{{ anchor.getDate() }}</div>
+          <div class="cal-day-meta">
+            <span class="cal-day-weekday">{{ anchor | date:'EEEE' }}</span>
+            <span class="cal-day-full">{{ anchor | date:'MMMM d, y' }}</span>
+          </div>
+        </div>
+        <div class="cal-day-events" *ngIf="dayEvents.length; else emptyDay">
+          <button
+            type="button"
+            class="cal-chip cal-chip-lg cal-chip-slot"
+            *ngFor="let chip of dayEvents"
+            [style.background]="chip.bg"
+            (click)="openJobPopup(chip)"
+            [attr.title]="chip.job ? 'View job details' : chip.label"
+          >{{ chip.label }}</button>
+        </div>
+        <ng-template #emptyDay>
+          <p class="cal-empty">No jobs scheduled for this day.</p>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Week view: click day or chip → Day view -->
+    <ng-container *ngIf="viewMode === 'week'">
+      <div class="cal-weekdays">
+        <button
+          type="button"
+          class="cal-weekday cal-weekday-btn"
+          *ngFor="let cell of weekCells"
+          (click)="openDayView(cell.date)"
+          [attr.title]="'Open ' + (cell.date | date:'MMM d') + ' day view'"
+        >
+          <span class="cal-weekday-name">{{ cell.weekdayLabel }}</span>
+          <span class="cal-weekday-date" [class.today]="cell.isToday">{{ cell.day }}</span>
+        </button>
+      </div>
+      <div class="cal-grid cal-grid-week">
+        <button
+          type="button"
+          class="cal-day cal-day-week cal-day-clickable"
+          *ngFor="let cell of weekCells"
+          [class.cal-day-today]="cell.isToday"
+          [class.cal-day-muted]="cell.isOutsideMonth"
+          (click)="openDayView(cell.date)"
+          [attr.title]="'View schedule for ' + (cell.date | date:'MMM d')"
+        >
+          <div class="cal-day-num" [class.today]="cell.isToday">{{ cell.day }}</div>
+          <div
+            class="cal-chip"
+            *ngFor="let chip of cell.chips"
+            [style.background]="chip.bg"
+            (click)="openDayView(cell.date, $event)"
+          >{{ chip.label }}</div>
+        </button>
+      </div>
+    </ng-container>
+
+    <!-- Month view: click day or "3 jobs" chip → Day view -->
+    <ng-container *ngIf="viewMode === 'month'">
+      <div class="cal-weekdays">
+        <div class="cal-weekday" *ngFor="let day of weekDays">{{ day }}</div>
+      </div>
+      <div class="cal-grid">
+        <ng-container *ngFor="let cell of monthCells">
+          <div class="cal-day cal-day-empty" *ngIf="!cell"></div>
+          <button
+            type="button"
+            class="cal-day cal-day-clickable"
+            *ngIf="cell"
+            [class.cal-day-today]="cell.isToday"
+            (click)="openDayView(cell.date)"
+            [attr.title]="'View schedule for ' + (cell.date | date:'MMM d')"
+          >
+            <div class="cal-day-num" [class.today]="cell.isToday">{{ cell.day }}</div>
+            <div
+              class="cal-chip"
+              *ngFor="let chip of cell.chips"
+              [style.background]="chip.bg"
+              (click)="openDayView(cell.date, $event)"
+            >{{ chip.label }}</div>
+          </button>
+        </ng-container>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<!-- Job detail popup card (My Jobs style) -->
+<div class="job-popup-overlay" *ngIf="jobPopupOpen && selectedJob" (click)="closeJobPopup()">
+  <div class="job-popup-card" [style.border-left-color]="selectedJob.borderColor" (click)="$event.stopPropagation()" role="dialog" aria-label="Job details">
+    <div class="job-popup-head">
+      <div>
+        <h3>Job Details</h3>
+        <p *ngIf="selectedSlotLabel">{{ selectedSlotLabel }}</p>
+      </div>
+      <button type="button" class="job-popup-close" (click)="closeJobPopup()" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="job-card-head">
+      <div>
+        <div class="job-title">{{ selectedJob.service }}</div>
+        <div class="job-id">{{ selectedJob.id }}</div>
+      </div>
+      <div class="job-head-badges">
+        <span class="badge" [ngClass]="priorityBadge(selectedJob.priority)">{{ priorityLabel(selectedJob.priority) }}</span>
+        <span class="badge" [ngClass]="selectedJob.statusBadge">{{ selectedJob.statusLabel }}</span>
+      </div>
+    </div>
+
+    <div class="job-meta">
+      <div class="job-meta-item"><i class="fa-solid fa-layer-group"></i> {{ selectedJob.category }}</div>
+      <div class="job-meta-item"><i class="fa-solid fa-flag"></i> Priority: {{ priorityLabel(selectedJob.priority) }}</div>
+      <div class="job-meta-item"><i class="fa-solid fa-user"></i> {{ selectedJob.customer }}</div>
+      <div class="job-meta-item"><i class="fa-solid fa-phone"></i> {{ selectedJob.phone }}</div>
+      <div class="job-meta-item"><i class="fa-solid fa-location-dot"></i> {{ selectedJob.address }}</div>
+      <div class="job-meta-item"><i class="fa-solid fa-clock"></i> Due: {{ selectedJob.due }}</div>
+      <div class="job-meta-item" *ngIf="selectedJob.amount"><i class="fa-solid fa-coins"></i> {{ selectedJob.amount }}</div>
+    </div>
+
+    <div class="job-reason" *ngIf="selectedJob.statusReason">
+      <i class="fa-solid fa-comment-dots"></i>
+      <span><strong>Reason:</strong> {{ selectedJob.statusReason }}</span>
+    </div>
+
+    <div class="job-actions">
+      <button
+        type="button"
+        class="btn btn-accent btn-sm"
+        (click)="navigateJob(selectedJob)"
+        [disabled]="!canNavigate(selectedJob)"
+        title="Open navigation (under construction)"
+      >
+        <i class="fa-solid fa-map-location-dot"></i> Navigate
+      </button>
+
+      <ng-container *ngIf="isPendingDecision(selectedJob)">
+        <button type="button" class="btn btn-accent btn-sm" (click)="acceptJob(selectedJob)">
+          <i class="fa-solid fa-check"></i> Accept
+        </button>
+        <button type="button" class="btn btn-ghost btn-sm job-reject-btn" (click)="openRejectModal(selectedJob)">
+          <i class="fa-solid fa-ban"></i> Reject
+        </button>
+      </ng-container>
+
+      <ng-container *ngIf="canUpdateStatus(selectedJob)">
+        <button type="button" class="btn btn-outline btn-sm" (click)="openStatusModal(selectedJob)">
+          <i class="fa-solid fa-arrows-rotate"></i> Update Status
+        </button>
+        <button
+          type="button"
+          class="btn btn-ghost btn-sm job-reject-btn"
+          (click)="openRejectModal(selectedJob)"
+          [disabled]="selectedJob.status === 'done'"
+        >
+          <i class="fa-solid fa-ban"></i> Reject
+        </button>
+      </ng-container>
+
+      <ng-container *ngIf="selectedJob.status === 'rejected'">
+        <button type="button" class="btn btn-outline btn-sm" (click)="reassignJob(selectedJob)" [disabled]="selectedJob.reassignRequested">
+          <i class="fa-solid fa-user-group"></i>
+          {{ selectedJob.reassignRequested ? 'Reassign Requested' : 'Reassign' }}
+        </button>
+        <button type="button" class="btn btn-accent btn-sm" (click)="redoJob(selectedJob)">
+          <i class="fa-solid fa-rotate-left"></i> Redo
+        </button>
+      </ng-container>
+
+      <button type="button" class="btn btn-ghost btn-sm" (click)="openChat(selectedJob)">
+        <i class="fa-solid fa-comments"></i> Chat
+      </button>
+      <button type="button" class="btn btn-outline btn-sm" (click)="closeJobPopup()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Status / Reject modal (same flow as My Jobs) -->
+<div class="job-popup-overlay" *ngIf="statusModalOpen && selectedJob" (click)="closeStatusModal()">
+  <div class="job-popup-card status-modal-card" (click)="$event.stopPropagation()" role="dialog" [attr.aria-label]="statusModalTitle">
+    <div class="job-popup-head">
+      <div>
+        <h3>{{ statusModalTitle }}</h3>
+        <p>{{ selectedJob.id }} · {{ selectedJob.service }}</p>
+      </div>
+      <button type="button" class="job-popup-close" (click)="closeStatusModal()" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <ng-container *ngIf="statusModalMode === 'status'">
+      <label class="status-modal-label">Select status</label>
+      <div class="status-grid">
+        <button
+          type="button"
+          class="status-option"
+          *ngFor="let opt of statusOptions"
+          [class.active]="selectedStatus === opt.id"
+          (click)="selectStatus(opt.id)"
+        >
+          <i class="fa-solid" [ngClass]="opt.icon"></i>
+          <span>{{ opt.label }}</span>
+        </button>
+      </div>
+    </ng-container>
+
+    <div class="reject-note" *ngIf="statusModalMode === 'reject'">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span>Rejecting will notify the agent. A reason is required.</span>
+    </div>
+
+    <div class="reason-block" *ngIf="statusNeedsReason()">
+      <label class="status-modal-label" for="sched-reason">{{ reasonLabel }} <em>*</em></label>
+      <textarea id="sched-reason" rows="3" [(ngModel)]="reason" name="schedReason" placeholder="Enter reason…"></textarea>
+    </div>
+
+    <div class="job-actions">
+      <button type="button" class="btn btn-outline btn-sm" (click)="closeStatusModal()">Cancel</button>
+      <button
+        type="button"
+        class="btn btn-sm"
+        [class.btn-accent]="statusModalMode === 'status'"
+        [class.btn-danger]="statusModalMode === 'reject'"
+        (click)="confirmStatusModal()"
+      >
+        <i class="fa-solid" [ngClass]="statusModalMode === 'reject' ? 'fa-ban' : 'fa-check'"></i>
+        {{ statusModalMode === 'reject' ? 'Reject Job' : 'Save Status' }}
+      </button>
+    </div>
+  </div>
+</div>

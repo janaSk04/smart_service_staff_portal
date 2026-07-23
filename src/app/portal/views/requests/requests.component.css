@@ -1,0 +1,32 @@
+.card-head-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.table-actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.text-sm {
+  font-size: 0.82rem;
+}
+
+.empty-cell {
+  text-align: center;
+  color: var(--text3);
+  padding: 2rem 1rem !important;
+}
+
+.table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  color: var(--text2);
+}
