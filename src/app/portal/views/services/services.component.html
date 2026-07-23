@@ -1,0 +1,122 @@
+<div class="dash-view active">
+  <div class="page-title">
+    <h1>Service Catalog</h1>
+    <p>Manage offerings, pricing, SLA and activation</p>
+  </div>
+
+  <div class="card catalog-controls-card">
+    <div class="card-head">
+      <h3>Catalog Controls</h3>
+      <div class="card-head-actions">
+        <input
+          type="text"
+          class="catalog-search"
+          placeholder="Search service..."
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearch()"
+        />
+        <button type="button" class="btn btn-accent btn-sm" (click)="openAddModal()">
+          <i class="fa-solid fa-plus"></i> Add Service
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Service</th>
+            <th>Category</th>
+            <th>Base Fee (LKR)</th>
+            <th>SLA (hrs)</th>
+            <th>Status</th>
+            <th>Requests</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of pagedCatalog">
+            <td class="dt-id">{{ item.id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.category }}</td>
+            <td>{{ item.baseFee | number }}</td>
+            <td>{{ item.slaHrs }}</td>
+            <td><span class="badge" [ngClass]="statusBadge(item.status)">{{ item.status }}</span></td>
+            <td>{{ item.requests }}</td>
+            <td>
+              <div class="table-actions">
+                <button type="button" class="btn btn-ghost btn-sm btn-icon" (click)="viewService(item.id)" title="View">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+                <button type="button" class="btn btn-outline btn-sm btn-icon" (click)="editService(item.id)" title="Edit">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <button type="button" class="btn btn-outline btn-sm btn-icon" (click)="toggleStatus(item)" title="Toggle status">
+                  <i class="fa-solid fa-power-off"></i>
+                </button>
+                <button type="button" class="btn btn-danger btn-sm btn-icon" (click)="deleteService(item)" title="Delete">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="catalog.length === 0">
+            <td colspan="8" class="empty-cell">No services found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-pagination" *ngIf="catalog.length">
+      <button type="button" class="btn btn-outline btn-sm" [disabled]="page === 1" (click)="prevPage()">
+        <i class="fa-solid fa-chevron-left"></i> Prev
+      </button>
+      <span>Page {{ page }} of {{ totalPages }}</span>
+      <button type="button" class="btn btn-outline btn-sm" [disabled]="page === totalPages" (click)="nextPage()">
+        Next <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<app-form-modal
+  [open]="showAddModal"
+  (openChange)="showAddModal = $event"
+  title="Add Service"
+  subtitle="Create a new catalog offering"
+  saveLabel="Save Service"
+  (save)="saveService()"
+  (cancel)="closeAddModal()"
+>
+  <div class="form-grid">
+    <div class="form-field full">
+      <label for="svc-name">Service Name <em>*</em></label>
+      <input id="svc-name" type="text" [(ngModel)]="serviceForm.name" name="svcName" placeholder="e.g. Plumbing Repair" />
+    </div>
+    <div class="form-field">
+      <label for="svc-category">Category <em>*</em></label>
+      <select id="svc-category" [(ngModel)]="serviceForm.category" name="svcCategory">
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label for="svc-status">Status</label>
+      <select id="svc-status" [(ngModel)]="serviceForm.status" name="svcStatus">
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label for="svc-fee">Base Fee (LKR) <em>*</em></label>
+      <input id="svc-fee" type="number" min="1" [(ngModel)]="serviceForm.baseFee" name="svcFee" />
+    </div>
+    <div class="form-field">
+      <label for="svc-sla">SLA (hours) <em>*</em></label>
+      <input id="svc-sla" type="number" min="1" [(ngModel)]="serviceForm.slaHrs" name="svcSla" />
+    </div>
+  </div>
+</app-form-modal>
+

@@ -1,0 +1,56 @@
+.report-templates-card {
+  margin-bottom: 1.5rem;
+}
+
+.report-template-card {
+  padding: 1rem;
+}
+
+.report-template-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.35rem;
+}
+
+.report-template-desc {
+  font-size: 0.8rem;
+  color: var(--text2);
+  margin-bottom: 0.75rem;
+  line-height: 1.45;
+}
+
+.report-template-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.65rem;
+}
+
+.report-template-format {
+  font-size: 0.75rem;
+  color: var(--text3);
+}
+
+.table-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.empty-cell {
+  text-align: center;
+  color: var(--text3);
+  padding: 2rem 1rem !important;
+}
+
+.table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  color: var(--text2);
+}
